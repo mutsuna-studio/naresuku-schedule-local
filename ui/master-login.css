@@ -1,0 +1,124 @@
+.admin-theme .login-layout{width:min(100%,344px);transition:transform .65s cubic-bezier(.16,1,.3,1),filter .65s,opacity .65s}
+.admin-theme .login-heading{margin-bottom:28px}
+.admin-theme .login-heading h1{font-size:29px;letter-spacing:.08em}
+.admin-theme .login-card{padding-block:16px}
+.admin-theme .slack-login{min-height:54px;border-radius:12px;box-shadow:0 2px 3px #24202d04;transition:transform .2s,box-shadow .2s,background .2s}
+.admin-theme .slack-login:hover{transform:translateY(-2px);box-shadow:0 6px 20px #24202d09}
+.admin-theme .login-progress{min-height:26px;padding-top:8px}
+.admin-theme .login-help summary{display:flex;align-items:center;justify-content:center;min-height:40px;padding:8px}
+.admin-theme .login-help[open]{padding:0 16px 12px;background:#f0eef333;border-radius:12px}
+.admin-theme .master-entry{display:flex;align-items:center;justify-content:center;gap:7px;margin:20px auto 0;min-height:44px;padding:8px 14px;color:#78717e;font-size:11px;border:0;border-radius:30px;cursor:pointer;transition:color .25s,background .25s}
+.admin-theme .master-entry:hover{color:#74543a;background:#efe6d755}
+.master-entry-star{opacity:0;transform:scale(.3) rotate(-90deg);transition:opacity .3s,transform .4s}
+.master-entry:hover .master-entry-star,.master-entry:focus-visible .master-entry-star{opacity:1;transform:scale(1) rotate(0)}
+.master-entry:focus-visible{outline:2px solid #8b7150;outline-offset:3px}
+.login-optic{display:block;width:100%;height:100%;overflow:visible}
+.optic-blades{transform-box:fill-box;transform-origin:center;transition:transform 1.1s cubic-bezier(.2,.8,.2,1)}
+.admin-theme .master-vault{width:calc(100% - 32px);max-width:460px;min-width:0;max-height:calc(100svh - 32px);overflow-y:auto;overflow-x:hidden;isolation:isolate;padding:0;gap:0;border:1px solid #c6b88852;border-radius:12px;background:#171e28;color:#e6d5a7;box-shadow:0 35px 100px #080a1b66,0 0 0 5px #cbb78608;transform-origin:50% 65%}
+.admin-theme .master-vault[data-state="open"]{animation:vault-panel-in .8s cubic-bezier(.16,1,.3,1) both}
+.admin-theme .master-vault[data-state="closed"]{animation:vault-panel-out .28s cubic-bezier(.4,0,1,1) both}
+.vault-scenery{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:-1;border-radius:inherit;background:radial-gradient(ellipse at 30% 0%,#b5b0820d,transparent 65%)}
+.vault-grid{position:absolute;inset:0;background-image:linear-gradient(#e6d3ad04 1px,transparent 1px),linear-gradient(90deg,#e6d3ad04 1px,transparent 1px);background-size:24px 24px;mask-image:linear-gradient(#000,transparent 60%)}
+.vault-content{position:relative;flex:none;padding:34px 38px 24px}
+.master-vault[data-state="open"] .vault-content{animation:vault-reveal .65s .14s both}
+.vault-optics{height:230px;position:relative;display:grid;place-items:center;margin:0 -10px 0;border-bottom:1px solid #d9c59626;color:#cbbb8c;isolation:isolate}
+.vault-optics::before{content:"";position:absolute;width:180px;height:180px;border-radius:50%;background:radial-gradient(circle,#e9dca814,transparent 67%);transition:opacity .6s;opacity:.4;z-index:-1}
+.vault-optics .login-optic{width:210px;height:210px;margin-top:-15px}
+.vault-optics .optic-blades{animation:optic-open 1.1s .08s cubic-bezier(.16,1,.3,1) both}
+.vault-optics .optic-calibration{transform-box:fill-box;animation:optic-register 1.1s .08s cubic-bezier(.16,1,.3,1) both;transform-origin:center}
+.optic-core{transition:filter .6s,opacity .6s}
+.optic-corner{position:absolute;width:13px;height:13px;border-color:#cbbb8c50;border-style:solid}
+.optic-corner.top-left{top:8px;left:0;border-width:1px 0 0 1px}
+.optic-corner.bottom-right{bottom:20px;right:0;border-width:0 1px 1px 0}
+.optic-track{position:absolute;left:0;top:66px;display:grid;gap:12px}
+.optic-track i{display:block;width:6px;height:1px;background:#cbbb8c40}
+.optic-track i:nth-child(3){width:12px;background:#cbbb8cb0}
+
+
+.vault-content:has(.vault-password:focus-within) .optic-blades{rotate:30deg}
+.vault-content:has(.vault-password:focus-within) .optic-core{filter:drop-shadow(0 0 7px #ead492);opacity:1}
+.vault-content:has(.vault-password:focus-within) .vault-optics::before{opacity:1}
+.vault-optics .optic-blades{transition:rotate 1.1s cubic-bezier(.2,.8,.2,1)}
+.vault-content.verifying .optic-calibration{animation:optic-search 3s linear infinite}
+
+
+.vault-form{display:grid;gap:10px;margin-top:22px;animation:vault-reveal .65s .24s both}
+.vault-password{position:relative}
+.admin-theme .vault-password input{height:50px;border:1px solid #b8b29840;background:#10172280;color:#fff4df;border-radius:4px;font-size:16px;transition:border-color .2s,background .2s}
+.vault-password input::placeholder{color:#96989f;font-size:12px}
+.vault-password input:focus-visible{outline:1px solid #d7c592;outline-offset:3px;border-color:#d7c592;background:#101722}
+
+.admin-theme .vault-submit{width:100%;height:50px;margin-top:6px;border-radius:4px;background:#d5c597;color:#20261f;border:1px solid #f1e5c03d;font-size:13px;font-weight:600;box-shadow:inset 0 1px 0 #fff4ce40;transition:background .2s,transform .2s}
+.admin-theme .vault-submit:hover:not(:disabled){background:#e7d8ac;transform:translateY(-1px)}
+.admin-theme .vault-submit:disabled{opacity:.45}
+
+
+
+.vault-error{padding:10px 12px;border:1px solid #e9968e50;background:#822d3029;border-radius:4px;color:#ffd4cd;font-size:12px;line-height:1.6}
+.vault-close{position:absolute;right:8px;top:8px;z-index:3;display:grid;place-items:center;width:40px;height:40px;color:#c7c5b6;border-radius:50%;cursor:pointer}
+.vault-close:hover{background:#ffffff0c}
+.vault-close:focus-visible{outline:2px solid #d7b77b;outline-offset:-3px}
+
+
+
+
+.admin-theme:has(.master-vault[data-state="open"]) .login-layout{transform:scale(.94) translateY(8px);filter:blur(3px);opacity:.55}
+.admin-theme:has(.master-vault) [data-slot="dialog-overlay"]{background:radial-gradient(ellipse at 50% 43%,#b4ac8b0a 0%,#15182745 45%,#090d1b70 100%);backdrop-filter:blur(7px)}
+.admin-theme:has(.master-vault) [data-slot="dialog-overlay"][data-state="open"]{animation:vault-stage-in .65s ease-out both}
+.admin-theme:has(.master-vault) [data-slot="dialog-overlay"][data-state="closed"]{animation:vault-stage-out .28s ease-in both}
+.vault-scenery::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(115deg,transparent 25%,#f6db9c12 44%,#fff3cb20 50%,transparent 72%);opacity:0;animation:vault-sheen 1s .1s ease-out both}
+.master-vault[data-state="closed"] .vault-scenery::after{animation:none}
+@keyframes optic-open{from{transform:rotate(-60deg) scale(.5);opacity:0}to{transform:rotate(0) scale(1);opacity:1}}
+@keyframes optic-register{from{transform:rotate(120deg);opacity:0}to{transform:rotate(0);opacity:1}}
+@keyframes optic-search{to{transform:rotate(360deg)}}
+@keyframes vault-reveal{from{opacity:0;filter:blur(4px)}to{opacity:1;filter:blur(0)}}
+@keyframes vault-panel-in{0%{opacity:0;transform:perspective(1100px) translateY(60px) rotateX(12deg) scale(.84);filter:blur(8px)}65%{opacity:1;filter:blur(0)}100%{opacity:1;transform:perspective(1100px) translateY(0) rotateX(0) scale(1);filter:blur(0)}}
+@keyframes vault-panel-out{from{opacity:1;transform:translateY(0) scale(1);filter:blur(0)}to{opacity:0;transform:translateY(24px) scale(.94);filter:blur(4px)}}
+@keyframes vault-stage-in{from{opacity:0;backdrop-filter:blur(0)}to{opacity:1;backdrop-filter:blur(7px)}}
+@keyframes vault-stage-out{from{opacity:1;backdrop-filter:blur(7px)}to{opacity:0;backdrop-filter:blur(0)}}
+@keyframes vault-sheen{0%{opacity:0;transform:translateX(-100%)}25%{opacity:1}100%{opacity:0;transform:translateX(100%)}}
+@media(max-width:480px){.vault-content{padding:24px 26px 18px}.vault-optics{height:210px;margin-bottom:0}.vault-optics .login-optic{width:180px;height:180px}.vault-form{margin-top:22px}}
+@media(prefers-reduced-motion:reduce){.master-vault,.master-vault *,.login-layout,.login-layout *{animation:none!important;transition:none!important}.admin-theme:has(.master-vault) .login-layout{transform:none;filter:none;opacity:1}.vault-scenery::after{display:none}.admin-theme:has(.master-vault) [data-slot="dialog-overlay"]{animation:none!important}.vault-content:has(.vault-password:focus-within) .optic-blades{rotate:0deg}}
+
+/* Six repeated accents follow the geometry of the iris, without extra labels. */
+.optic-track.right{left:auto;right:0;transform:rotate(180deg)}
+.optic-orbits{transform-box:fill-box;transform-origin:center;animation:optic-register 1.1s .08s cubic-bezier(.16,1,.3,1) both;transition:rotate 1.1s cubic-bezier(.2,.8,.2,1)}
+.vault-content:has(.vault-password:focus-within) .optic-orbits{rotate:-30deg}
+.vault-index{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:26px;height:8px;color:#cbbb8c}
+.vault-index>span{height:1px;background:currentColor;opacity:.15;flex:1;margin-inline:6px}
+.vault-index>i{width:3px;height:3px;background:currentColor;opacity:.3;transform:rotate(45deg)}
+.vault-index>i.primary{opacity:.65}
+.vault-content.has-error .vault-password input{border-color:#d6a39c;outline-color:#d6a39c}
+.vault-content.has-error .optic-core{color:#d6a39c}
+@media(prefers-reduced-motion:reduce){.vault-content:has(.vault-password:focus-within) .optic-orbits{rotate:0deg}}
+
+/* Engraved type and layered clockwork, confined to the password dialog. */
+.admin-theme .master-vault{font-family:"Hiragino Mincho ProN","Yu Mincho",YuMincho,"Noto Serif JP",serif;border-color:#d5c08b70;box-shadow:0 35px 100px #080a1b66,inset 0 0 0 4px #d4bf8807,inset 0 0 0 5px #d4bf881c}
+.admin-theme .vault-submit{font-family:inherit;font-size:16px;font-weight:600;letter-spacing:.24em;background:linear-gradient(110deg,#bdab7e,#ebdcb0 45%,#c1ad7d);text-shadow:0 1px 0 #fff5d240}
+.admin-theme .vault-password input{font-family:inherit;letter-spacing:.12em}
+.admin-theme .vault-password input::placeholder{font-family:inherit;font-size:13px;font-weight:400;letter-spacing:.1em;color:#b3b1a9}
+.vault-error{font-family:"Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;letter-spacing:normal}
+.vault-optics{height:250px}
+.vault-optics .login-optic{width:242px;height:242px;margin-top:-6px;filter:drop-shadow(0 0 12px #d9bc6815)}
+.optic-mechanics,.optic-tracers{transform-box:fill-box;transform-origin:center}
+.optic-mechanics{animation:optic-search 48s linear infinite}
+.optic-tracers{animation:optic-search 16s linear infinite reverse;opacity:.6}
+.optic-orbits{animation:optic-register 1.1s .08s cubic-bezier(.16,1,.3,1) both}
+.vault-optics::after{content:"";position:absolute;inset:12px 20px 24px;pointer-events:none;background:linear-gradient(transparent 48%,#dfcf9715 50%,transparent 52%);animation:optic-scan 7s ease-in-out infinite;opacity:.4}
+.optic-corner{width:22px;height:22px;border-color:#d3bc8060}
+.optic-corner.top-right{top:8px;right:0;border-width:1px 1px 0 0}
+.optic-corner.bottom-left{bottom:20px;left:0;border-width:0 0 1px 1px}
+.optic-track{gap:10px;top:85px}
+.optic-track i{box-shadow:0 3px 0 #cbbb8c15}
+.vault-border-light{position:absolute;inset:8px;border:1px solid #cbbb8c18;border-radius:6px;pointer-events:none}
+.vault-border-light::before,.vault-border-light::after{content:"";position:absolute;width:38px;height:1px;background:linear-gradient(90deg,transparent,#ead9a9,transparent);animation:frame-glint 6s ease-in-out infinite}
+.vault-border-light::before{top:-1px;left:15%}
+.vault-border-light::after{bottom:-1px;right:15%;animation-delay:-3s}
+.vault-index>i{animation:index-glow 3s ease-in-out infinite}
+.vault-index>i:nth-of-type(2){animation-delay:.2s}.vault-index>i:nth-of-type(3){animation-delay:.4s}.vault-index>i:nth-of-type(4){animation-delay:.6s}.vault-index>i:nth-of-type(5){animation-delay:.8s}.vault-index>i:nth-of-type(6){animation-delay:1s}
+.vault-content:has(.vault-password:focus-within) .optic-mechanics,.vault-content:has(.vault-password:focus-within) .optic-tracers{animation-play-state:paused}
+@keyframes optic-scan{0%,100%{transform:translateY(-18px);opacity:0}50%{transform:translateY(18px);opacity:.65}}
+@keyframes frame-glint{0%,100%{opacity:.1;transform:translateX(0)}50%{opacity:.65;transform:translateX(100px)}}
+@keyframes index-glow{0%,100%{opacity:.2}50%{opacity:.8}}
+@media(max-width:480px){.vault-optics{height:224px}.vault-optics .login-optic{width:214px;height:214px}.admin-theme .vault-submit{font-size:15px}}
+@media(prefers-reduced-motion:reduce){.vault-optics::after,.vault-border-light::before,.vault-border-light::after{animation:none;display:none}.master-vault *{animation:none!important}}

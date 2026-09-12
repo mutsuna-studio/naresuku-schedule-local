@@ -1,0 +1,21 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "types": [
+      "svelte",
+      "node",
+      "vite/client"
+    ],
+    "verbatimModuleSyntax": false
+  },
+  "include": [
+    "./**/*.svelte",
+    "./**/*.ts",
+    "../lib/scheduler.ts",
+    "../lib/recurrence.ts",
+    "../lib/japanese-holidays.d.ts"
+  ],
+  "exclude": [
+    "../node_modules"
+  ]
+}

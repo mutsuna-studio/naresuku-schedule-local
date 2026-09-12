@@ -1,0 +1,796 @@
+/* SILT 02 — management dashboard only. Parent and staff portals keep their own brand theme. */
+:root.admin-theme {
+  color-scheme: light;
+
+  --canvas: #e3e1e4;
+  --surface: #f1eee8;
+  --surface-raised: #f7f3ef;
+  --surface-sunken: #e7e3e2;
+  --ink: #302d35;
+  --ink-muted: #645d69;
+  --line: #cbc4cc;
+  --control-border: #756b77;
+  --primary: #78365f;
+  --primary-hover: #623653;
+  --primary-soft: #eadbe6;
+  --on-primary: #f7eef4;
+  --spark: #d5e785;
+  --spark-ink: #46551c;
+  --spark-soft: #e8eccf;
+  --data-1: #2b7062;
+  --data-2: #66649e;
+  --data-3: #a6543d;
+  --data-4: #8a661c;
+  --data-5: #78365f;
+  --data-area: #e1e8e0;
+  --data-reference: #78717d;
+  --success: #28624c;
+  --success-soft: #dfeadd;
+  --warning: #7b5317;
+  --warning-soft: #f0e3c9;
+  --danger: #a13845;
+  --danger-soft: #f3dedf;
+  --info: #455786;
+  --info-soft: #e0e5f0;
+  --focus: #78365f;
+
+  /* Mutsuna UI semantic tokens */
+  --background: var(--surface);
+  --foreground: var(--ink);
+  --card: var(--surface-raised);
+  --card-foreground: var(--ink);
+  --popover: var(--surface-raised);
+  --popover-foreground: var(--ink);
+  --primary-foreground: var(--on-primary);
+  --secondary: var(--surface-sunken);
+  --secondary-foreground: var(--ink);
+  --muted: var(--surface-sunken);
+  --muted-foreground: var(--ink-muted);
+  --accent: var(--primary-soft);
+  --accent-foreground: var(--primary);
+  --destructive: var(--danger);
+  --border: var(--line);
+  --input: var(--control-border);
+  --ring: var(--focus);
+  --chart-1: var(--data-1);
+  --chart-2: var(--data-2);
+  --chart-3: var(--data-3);
+  --chart-4: var(--data-4);
+  --chart-5: var(--data-5);
+  --sidebar: var(--canvas);
+  --sidebar-foreground: var(--ink);
+  --sidebar-primary: var(--primary);
+  --sidebar-primary-foreground: var(--on-primary);
+  --sidebar-accent: var(--primary-soft);
+  --sidebar-accent-foreground: var(--primary);
+  --sidebar-border: var(--line);
+  --sidebar-ring: var(--focus);
+}
+
+.admin-theme body {
+  background: var(--canvas);
+  color: var(--ink);
+}
+
+.admin-theme .shell-content,
+.admin-theme .dashboard-page {
+  background: var(--surface);
+}
+
+.admin-theme .dashboard-workspace,
+.admin-theme .dashboard-workspace [data-slot='card'],
+.admin-theme .dashboard-workspace [data-slot='card-content'] {
+  color: var(--ink);
+}
+
+.admin-theme .planner-toolbar,
+.admin-theme .month-day,
+.admin-theme .weekday-card,
+.admin-theme .teacher-row,
+.admin-theme .student-editor-row,
+.admin-theme .placement-summary > div,
+.admin-theme .request-wish,
+.admin-theme .generation-summary,
+.admin-theme .week-strip button {
+  border-color: var(--line);
+  background: var(--surface-raised);
+}
+
+.admin-theme .month-day > header,
+.admin-theme .view-switch,
+.admin-theme .shift-weekday,
+.admin-theme .adopt-summary {
+  background: var(--surface-sunken);
+}
+
+.admin-theme .good,
+.admin-theme .placement-ok,
+.admin-theme .shift-chip.yes {
+  border-color: var(--success);
+  background: var(--success-soft);
+  color: var(--success);
+}
+
+.admin-theme .teacher-group.unassigned,
+.admin-theme .unassign-drop,
+.admin-theme .placement-transfer.incoming {
+  border-color: var(--warning);
+  background: var(--warning-soft);
+  color: var(--warning);
+}
+
+.admin-theme .error,
+.admin-theme .login-error,
+.admin-theme .placement-summary .attention,
+.admin-theme .placement-request-card {
+  border-color: var(--danger);
+  background: var(--danger-soft);
+  color: var(--danger);
+}
+
+.admin-theme .placement-transfer,
+.admin-theme .request-wish > .wish-priority {
+  border-color: var(--info);
+  background: var(--info-soft);
+  color: var(--info);
+}
+
+.admin-theme .shift-chip.duty {
+  box-shadow: inset 3px 0 0 var(--primary);
+}
+
+/* Daily matching board */
+.admin-theme .lesson-board {
+  background: var(--surface);
+}
+
+.admin-theme .lesson-board {
+  gap: 7px 0;
+  align-items: start;
+}
+
+.admin-theme .lesson-board > .slot-title {
+  align-self: stretch;
+  padding-inline: 8px;
+  border-right: 1px solid var(--line);
+}
+
+.admin-theme .lesson-board > .slot-title.last-slot,
+.admin-theme .lesson-board > .slot-footer.last-slot {
+  border-right: 0;
+}
+
+.admin-theme .teacher-segment {
+  align-self: start;
+  min-width: 0;
+  overflow: hidden;
+  border-radius: 6px;
+  background: var(--teacher-bg);
+  box-shadow: none;
+  margin-inline: 4px;
+}
+
+.admin-theme .teacher-segment.current-staff {
+  background: color-mix(in srgb, var(--primary-soft) 58%, var(--teacher-bg));
+  box-shadow: inset 0 0 0 2px var(--primary);
+}
+
+.admin-theme .teacher-segment > header {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 30px;
+  padding: 5px 9px 3px;
+  background: transparent;
+  color: var(--teacher-ink);
+  font-size: 12px;
+}
+
+.admin-theme .teacher-segment-periods {
+  display: grid;
+}
+
+.admin-theme .teacher-period {
+  min-width: 0;
+  padding: 3px 8px 7px;
+  border-left: 1px solid color-mix(in srgb, var(--teacher-color) 24%, var(--line));
+}
+
+.admin-theme .teacher-period:first-child {
+  border-left: 0;
+}
+
+.admin-theme .teacher-period .student-card-shell:last-child {
+  margin-bottom: 0;
+}
+
+.admin-theme .slot-footer {
+  align-self: start;
+  min-width: 0;
+  padding: 0 6px 10px;
+  border-right: 1px solid var(--line);
+}
+
+.admin-theme .slot-column {
+  border-color: var(--line);
+}
+
+.admin-theme .slot-title,
+.admin-theme .slot-title small,
+.admin-theme .teacher-heading small,
+.admin-theme .student-card p,
+.admin-theme .absent-row {
+  color: var(--ink-muted);
+}
+
+.admin-theme .slot-title strong,
+.admin-theme .student-card strong {
+  color: var(--ink);
+}
+
+.admin-theme .teacher-group:not(.unassigned) .student-card {
+  background: var(--surface-raised);
+}
+
+.admin-theme .teacher-group.unassigned {
+  border-left-color: var(--warning);
+  background: var(--warning-soft);
+}
+
+.admin-theme .teacher-group.unassigned .avatar,
+.admin-theme .request-tag {
+  background: var(--warning-soft);
+  color: var(--warning);
+}
+
+.admin-theme .teacher-group.unassigned .student-card {
+  background: color-mix(in srgb, var(--surface-raised) 82%, var(--warning-soft));
+}
+
+.admin-theme .teacher-group.absent {
+  border-left-color: var(--danger);
+  background: var(--danger-soft);
+}
+
+.admin-theme .teacher-group.absent .teacher-heading strong {
+  color: var(--danger);
+}
+
+.admin-theme .teacher-group.absent .student-card {
+  background: color-mix(in srgb, var(--surface-raised) 82%, var(--danger-soft));
+}
+
+.admin-theme .course {
+  background: var(--data-area);
+  color: var(--data-1);
+}
+
+.admin-theme .course.purple {
+  background: color-mix(in srgb, var(--data-2) 12%, var(--surface-raised));
+  color: var(--data-2);
+}
+
+.admin-theme .absent-row {
+  background: var(--danger-soft);
+  color: var(--danger);
+}
+
+.admin-theme .add-student {
+  border-color: var(--control-border);
+  color: var(--ink-muted);
+}
+
+.admin-theme .add-student:hover {
+  background: var(--primary-soft);
+  color: var(--primary);
+}
+
+.admin-theme .week-strip .selected {
+  border-color: var(--primary);
+  background: var(--primary);
+  color: var(--on-primary);
+}
+
+.admin-theme .week-strip {
+  display: flex;
+  gap: 6px;
+  padding-bottom: 10px;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  scrollbar-width: thin;
+}
+
+.admin-theme .week-strip button {
+  flex: 0 0 88px;
+  min-height: 32px;
+  padding: 5px 8px;
+  text-align: center;
+}
+
+.admin-theme .week-strip .date-strip-tail {
+  flex: 0 0 calc(100% - 88px);
+}
+
+.admin-theme .week-strip button span {
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.admin-theme .week-strip .selected small {
+  color: var(--on-primary);
+  opacity: .78;
+}
+
+.admin-theme .calendar-saturday {
+  color: var(--data-1) !important;
+}
+
+.admin-theme .calendar-sunday {
+  color: var(--data-3) !important;
+}
+
+.admin-theme .week-strip button.selected > span {
+  color: var(--on-primary) !important;
+}
+
+.admin-theme .week-strip button:not(.selected):hover {
+  background: var(--surface-sunken);
+  border-color: var(--control-border);
+}
+
+.admin-theme .week-strip button.selected:hover {
+  background: var(--primary);
+  color: var(--on-primary);
+}
+
+.admin-theme .week-strip button:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.admin-theme .issues > div {
+  border-color: var(--line);
+}
+
+.admin-theme .issues p,
+.admin-theme .issues > div > span {
+  color: var(--ink-muted);
+}
+
+/* Remove remaining legacy blue/gray/amber values from management views. */
+.admin-theme .text-blue-600 {
+  color: var(--data-1) !important;
+}
+
+.admin-theme .text-red-600 {
+  color: var(--data-3) !important;
+}
+
+.admin-theme .save-state,
+.admin-theme .source-chip,
+.admin-theme .stats span,
+.admin-theme .stats small,
+.admin-theme .eyebrow,
+.admin-theme .page-heading p,
+.admin-theme .preferences-heading p,
+.admin-theme .roster-toolbar,
+.admin-theme .student-name span,
+.admin-theme .pref-patterns small,
+.admin-theme .teacher-list label,
+.admin-theme .teacher-list > div > span:not(.avatar),
+.admin-theme .import-note p,
+.admin-theme .history-row time,
+.admin-theme .proposal-stat small,
+.admin-theme .empty,
+.admin-theme .loading,
+.admin-theme .placement-summary span,
+.admin-theme .request-heading > small,
+.admin-theme .request-wish > strong small,
+.admin-theme .adopt-summary span,
+.admin-theme .placement-transfer small {
+  color: var(--ink-muted);
+}
+
+.admin-theme .save-state span {
+  background: var(--success);
+}
+
+.admin-theme .save-state.unsaved span {
+  background: var(--warning);
+}
+
+.admin-theme .amber,
+.admin-theme .count,
+.admin-theme .request-tag {
+  color: var(--warning);
+}
+
+.admin-theme .count,
+.admin-theme .request-panel {
+  border-color: var(--warning);
+  background: var(--warning-soft);
+}
+
+.admin-theme .confirmed-tag,
+.admin-theme .placement-summary .complete strong {
+  color: var(--success);
+}
+
+.admin-theme .preference-list article,
+.admin-theme .request-panel button,
+.admin-theme .teacher-list > div,
+.admin-theme .history-row,
+.admin-theme .board-heading {
+  border-color: var(--line);
+}
+
+.admin-theme .pref-patterns button {
+  color: var(--primary);
+}
+
+.admin-theme .pref-patterns .setup-pref {
+  color: var(--ink-muted);
+}
+
+.admin-theme .share-status {
+  border-color: var(--info);
+  background: var(--info-soft);
+}
+
+.admin-theme .view-switch,
+.admin-theme .month-day > header {
+  border-color: var(--line);
+  background: var(--surface-sunken);
+}
+
+.admin-theme .month-lessons > button:not(.month-add) {
+  border-color: var(--line);
+  background: var(--surface-raised);
+}
+
+.admin-theme .month-lessons > button.unassigned,
+.admin-theme .assignment-targets .remove-assignment {
+  border-color: var(--warning);
+  background: var(--warning-soft);
+  color: var(--warning);
+}
+
+.admin-theme .month-add {
+  border-color: var(--control-border);
+  color: var(--ink-muted);
+}
+
+.admin-theme .proposal-stat {
+  background: var(--primary-soft);
+  color: var(--primary);
+}
+
+.admin-theme .assignment-tray {
+  border-color: var(--line);
+  background: color-mix(in srgb, var(--surface-raised) 96%, transparent);
+  box-shadow: 0 12px 36px color-mix(in srgb, var(--ink) 18%, transparent);
+}
+
+.admin-theme .request-heading > div > span {
+  background: var(--danger-soft);
+  color: var(--danger);
+}
+
+.admin-theme .request-message {
+  border-color: var(--line);
+  color: var(--ink-muted);
+}
+
+.admin-theme .placement-summary .attention strong {
+  color: var(--danger);
+}
+
+.admin-theme .placement-transfer {
+  border-left-color: var(--info);
+  background: var(--info-soft);
+}
+
+.admin-theme .placement-transfer.incoming {
+  border-left-color: var(--warning);
+  background: var(--warning-soft);
+}
+
+.admin-theme .student-review,
+.admin-theme .shift-chip.reserve {
+  color: var(--warning);
+}
+
+.admin-theme .shift-chip.reserve {
+  border-color: var(--warning);
+  background: var(--warning-soft);
+}
+
+.admin-theme .student-status {
+  background: var(--success-soft);
+  color: var(--success);
+}
+
+.admin-theme .status-paused {
+  background: var(--warning-soft);
+  color: var(--warning);
+}
+
+.admin-theme .status-withdrawn,
+.admin-theme .status-outside {
+  background: var(--surface-sunken);
+  color: var(--ink-muted);
+}
+
+.admin-theme .shift-weekday.weekend {
+  color: var(--data-1);
+}
+
+
+
+.admin-theme .admin-login {
+  background: linear-gradient(145deg, var(--ink) 0 42%, var(--primary) 100%);
+}
+
+.admin-theme .admin-login form {
+  border-color: var(--line);
+  background: var(--surface-raised);
+  color: var(--ink);
+}
+.admin-theme .slack-login{display:flex;align-items:center;justify-content:center;min-height:40px;border-radius:var(--radius);background:#4a154b;color:#fff;font-weight:700;text-decoration:none}
+.admin-theme .login-separator{display:flex!important;align-items:center!important;gap:10px!important;color:var(--muted-foreground);font-size:12px}
+.admin-theme .login-separator::before,.admin-theme .login-separator::after{content:"";height:1px;flex:1;background:var(--border)}
+.admin-theme .lesson-view{display:grid;gap:0;margin:0}.admin-theme .lesson-view>div{display:grid;grid-template-columns:7rem 1fr;gap:1rem;padding:.7rem 0;border-bottom:1px solid var(--line)}.admin-theme .lesson-view dt{color:var(--ink-muted);font-size:.85rem}.admin-theme .lesson-view dd{margin:0;color:var(--ink);font-weight:600}.admin-theme .lesson-view-link{display:flex;align-items:center;justify-content:center;gap:.45rem;margin-top:1rem;padding:.65rem;border:1px solid var(--success);border-radius:var(--radius);background:var(--success-soft);color:var(--success);font-weight:700;text-decoration:none}
+
+.admin-theme .login-mark {
+  background: var(--primary);
+  color: var(--on-primary);
+}
+
+.admin-theme [data-slot='button'][class*='bg-primary']:hover {
+  background: var(--primary-hover);
+}
+
+/* Minimal sign-in surface. */
+.admin-theme .admin-login{min-height:100svh;padding:32px 24px;display:grid;place-items:center;background:#fafafa;color:#26232a}
+.admin-theme .login-layout{width:min(100%,320px)}
+.admin-theme .login-card{width:100%}
+.admin-theme .login-heading{margin-bottom:32px;text-align:center}
+.admin-theme .login-heading h1{margin:0;color:#26232a;font-size:26px;font-weight:650;line-height:1.5;letter-spacing:.02em}
+.admin-theme .login-heading p{margin:16px 0 0;font-size:16px;line-height:1.7;color:#68636c}
+.admin-theme .slack-login{display:flex;align-items:center;justify-content:center;gap:12px;min-height:52px;padding:12px 20px;border:1px solid #ccc9ce;border-radius:6px;background:#fff;color:#26232a;font-size:16px;font-weight:600;text-decoration:none;transition:background .15s,border-color .15s}
+.admin-theme .slack-login img{display:block;flex:none}
+.admin-theme .slack-login:hover{background:#f3f2f4;border-color:#8c858f}
+.admin-theme .slack-login:focus-visible,.admin-theme .login-admin-access summary:focus-visible{outline:2px solid #78365f;outline-offset:4px}
+.admin-theme .login-admin-access{margin-top:24px}
+.admin-theme .login-admin-access summary{display:flex;align-items:center;justify-content:center;gap:4px;cursor:pointer;list-style:none;color:#767078;font-size:14px;width:fit-content;margin:auto;padding:6px;border-radius:4px}
+.admin-theme .login-admin-access summary::-webkit-details-marker{display:none}
+.admin-theme .login-admin-access summary:hover{color:#26232a}
+.admin-theme .login-admin-access[open] summary>svg:last-child{transform:rotate(90deg)}
+.admin-theme .login-admin-access form{display:grid;gap:16px;width:100%;padding:20px 0 0;margin:0;border:0;border-radius:0;box-shadow:none;background:transparent;color:#26232a}
+.admin-theme .login-admin-access label{color:#554e59;font-size:14px}
+.admin-theme .login-staff-step{display:grid;gap:18px}
+
+.admin-theme .slack-alternative{display:block;margin-top:14px;text-align:center;font-size:14px;color:#68636c;text-underline-offset:4px}.admin-theme .slack-alternative:hover{color:#26232a}.admin-theme .slack-alternative:focus-visible{outline:2px solid #78365f;outline-offset:4px}
+
+.mobile-day-board{display:none}
+@media(max-width:700px){
+ .admin-theme .dashboard-page{padding:12px!important;gap:12px}
+ .admin-theme .dashboard-workspace{gap:12px}
+ .admin-theme .planner{min-width:0}
+ .admin-theme .planner-toolbar{display:grid;gap:12px;padding:12px;min-width:0}
+ .admin-theme .planner-navigation{display:flex;flex-wrap:wrap;gap:10px;min-width:0;width:100%}
+ .admin-theme .date-control{display:grid;grid-template-columns:40px minmax(0,1fr) 40px;gap:6px;width:100%;min-width:0}
+ .admin-theme .date-control>button{min-width:0;width:100%;height:40px}
+ .admin-theme .planner-toolbar>.app-inline{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;width:100%;min-width:0}
+ .admin-theme .planner-toolbar>.app-inline>button{width:100%;height:auto;min-height:42px;padding:8px;font-size:13px;white-space:normal;line-height:1.5}
+ .admin-theme .planner-toolbar>.app-inline>button svg{flex-shrink:0;width:15px}
+ .admin-theme .week-strip{display:flex;gap:6px;overflow-x:auto;padding:8px 12px;min-width:0;max-width:100%;scrollbar-width:thin}
+ .admin-theme .week-strip>button{flex:0 0 86px;min-height:42px}
+ .admin-theme .week-strip .date-strip-tail{flex-basis:calc(100% - 86px)}
+ .admin-theme .desktop-day-board{display:none}
+ .admin-theme .mobile-day-board{display:grid;gap:16px;padding:12px;min-width:0}
+ .admin-theme .mobile-period{min-width:0;border-top:1px solid var(--line);padding-top:12px}
+ .admin-theme .mobile-period>header{display:flex;align-items:center;gap:12px;margin-bottom:10px;font-size:14px}
+ .admin-theme .mobile-period>header>span:last-child{margin-left:auto;color:var(--ink-muted)}
+ .admin-theme .mobile-teacher{padding:10px;margin-top:8px;background:var(--teacher-bg,var(--surface-sunken));border-left:0;border-radius:4px;min-width:0}
+ .admin-theme .mobile-teacher h3{margin:0 0 6px;font-size:14px;font-weight:600;color:var(--teacher-color,var(--ink-muted))}
+ .admin-theme .mobile-lesson{display:flex;align-items:center;flex-wrap:wrap;gap:4px 12px;width:100%;min-height:48px;padding:10px 8px;border:0;border-bottom:1px solid var(--line);background:var(--surface-raised);text-align:left;color:var(--ink)}
+ .admin-theme .mobile-lesson:last-child{border-bottom:0}
+ .admin-theme .mobile-lesson-name{display:flex;align-items:center;flex-wrap:wrap;gap:5px;font-size:15px;font-weight:600;overflow-wrap:anywhere}
+ .admin-theme .mobile-lesson-course{margin-left:auto;font-size:13px;color:var(--ink-muted);overflow-wrap:anywhere}
+ .admin-theme .mobile-lesson-request{flex-basis:100%;font-size:13px;color:var(--warning)}
+ .admin-theme .mobile-lesson:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+ .admin-theme .mobile-absent{border-color:var(--danger);background:var(--danger-soft)}
+ .admin-theme .mobile-add{width:100%;min-height:42px;margin-top:6px}
+ .admin-theme .mobile-period-empty{font-size:14px;color:var(--ink-muted);padding:8px}
+ .admin-theme .month-board{padding:0 12px 12px;min-width:0}
+ .admin-theme .month-periods{grid-template-columns:minmax(0,1fr)!important}
+ .admin-theme .month-period{border-right:0;border-bottom:1px solid var(--line);padding:12px;min-width:0}
+ .admin-theme .month-period:last-child{border-bottom:0}
+ .admin-theme .month-period-title strong,.admin-theme .month-period-title span{font-size:14px}
+ .admin-theme .month-lessons>button:not(.month-add){min-height:44px;flex-wrap:wrap;padding:9px;gap:4px 10px}
+ .admin-theme .month-lessons strong{font-size:14px;white-space:normal;overflow-wrap:anywhere}
+ .admin-theme .month-lessons span{font-size:13px;white-space:normal;max-width:none;margin-left:auto}
+ .admin-theme .month-add{min-height:40px}
+ .admin-theme .shell-header{height:auto;min-height:56px;flex-wrap:wrap;padding:8px 12px;gap:8px}
+ .admin-theme .shell-header nav{min-width:0}
+ .admin-theme .shell-header h1{font-size:14px}
+ .admin-theme .lesson-view>div{grid-template-columns:5rem minmax(0,1fr);gap:12px}
+ .admin-theme .lesson-view dd{overflow-wrap:anywhere}
+}
+@media(max-width:700px){
+ .admin-theme .shell-content{padding:0!important}
+ .admin-theme .dashboard-page{padding:10px!important;width:100%;box-sizing:border-box}
+ .admin-theme .shell-header>div:first-child{flex:1 0 100%}
+ .admin-theme .shell-header>div:last-child{margin-left:auto}
+ .admin-theme .shell-header h1{overflow:visible;white-space:normal;font-size:16px}
+ .admin-theme .month-lessons strong{text-align:left;margin-right:auto}
+ .admin-theme .planner-toolbar>.app-inline>button:nth-child(3){grid-column:1/-1}
+}
+@media(max-width:700px){.admin-theme .shell-header h1{max-width:none}.admin-theme .date-control .calendar-picker{padding-inline:6px}.admin-theme .date-control .calendar-picker span{white-space:normal;overflow:visible;text-overflow:clip;line-height:1.3}}
+@media(max-width:380px){.admin-theme .date-control .calendar-picker{font-size:13px}.admin-theme .date-control .calendar-picker>svg{display:none}}
+
+.admin-theme .lesson-board.drag-active .teacher-period{min-height:70px;outline:1px dashed var(--teacher-color);outline-offset:-3px}.admin-theme .lesson-board.drag-active .teacher-period:hover{background:var(--primary-soft)}.admin-theme .lesson-board.drag-active .slot-footer{min-height:72px;outline:1px dashed var(--control-border);outline-offset:-4px}.admin-theme .lesson-board.drag-active .slot-footer:hover{background:var(--primary-soft)}.admin-theme .slot-drop-hint{padding:14px 8px;font-size:12px;color:var(--ink-muted);text-align:center;pointer-events:none}
+
+.admin-theme .week-strip button.today{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+
+/* Match teacher identification on narrow screens without adding labels. */
+.admin-theme .mobile-teacher[style] h3{color:var(--teacher-ink)}
+.admin-theme .teacher-segment > header .mini-tag{background:transparent;color:inherit;border:1px solid currentColor}
+.admin-theme .assignment-targets button{color:var(--teacher-ink,var(--teacher-color))}
+
+/* Monthly lessons use the same quiet teacher grouping as the daily board. */
+.admin-theme .month-teacher-groups{display:grid;gap:6px}
+.admin-theme .month-teacher-group{min-width:0;padding:6px;border-radius:6px;background:var(--teacher-bg)}
+.admin-theme .month-teacher-group.unassigned{background:var(--warning-soft,#fff7e8)}
+.admin-theme .month-teacher-group.absent-group{background:var(--surface-sunken)}
+.admin-theme .month-teacher-group .month-student-name{display:flex;align-items:center;gap:4px;flex:1;min-width:0;max-width:100%;margin-left:0;color:var(--ink)}
+
+@media(max-width:700px){
+ .admin-theme .shift-shell-header{flex-wrap:nowrap;gap:6px;padding-inline:8px}
+ .admin-theme .shift-shell-header>div:first-child{flex:1 1 auto;min-width:0;gap:6px}
+ .admin-theme .shift-shell-header>div:last-child{flex:0 0 auto;gap:6px}
+ .admin-theme .shift-shell-header h1{font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+ .admin-theme .shift-shell-header [data-slot=button]{padding-inline:8px}
+}
+
+/* Keep schedule navigation compact within the available content width. */
+.admin-theme .planner{container-type:inline-size;container-name:schedule-planner}
+.admin-theme .planner-toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;padding:10px 12px;background:transparent}
+.admin-theme .planner-navigation{display:flex;align-items:center;flex-wrap:nowrap;gap:10px;width:auto;min-width:0;max-width:100%}
+.admin-theme .planner-navigation .view-switch{flex-shrink:0;gap:2px;padding:3px;border:0}
+.admin-theme .planner-navigation .view-switch button{min-width:36px;padding-inline:10px}
+.admin-theme .planner-navigation .date-control{display:grid;grid-template-columns:36px minmax(0,1fr) 36px;gap:4px;width:290px;min-width:0}
+.admin-theme .planner-navigation .date-control>button:not(.calendar-picker){width:36px;min-width:0;height:40px;padding:0}
+.admin-theme .planner-navigation .calendar-picker{min-width:0;width:100%;height:40px;padding-inline:8px}
+.admin-theme .planner-navigation .calendar-picker span{white-space:nowrap}
+.admin-theme .planner-toolbar>.app-inline{flex-wrap:wrap;gap:8px}
+.admin-theme .week-strip{padding-top:4px;padding-bottom:10px}
+@container schedule-planner (max-width:560px){
+ .admin-theme .planner-toolbar{padding:8px;gap:8px}
+ .admin-theme .planner-navigation{width:100%;gap:6px}
+ .admin-theme .planner-navigation .date-control{flex:1;grid-template-columns:28px minmax(0,1fr) 28px;gap:2px}
+ .admin-theme .planner-navigation .date-control>button:not(.calendar-picker){width:28px}
+ .admin-theme .planner-navigation .calendar-picker{padding-inline:3px;font-size:12px;gap:3px}
+ .admin-theme .planner-navigation .calendar-picker>svg{display:none}
+ .admin-theme .planner-navigation .month-navigator{flex:1;min-width:0;max-width:none;grid-template-columns:28px minmax(0,1fr) 28px;gap:2px}
+ .admin-theme .planner-navigation .month-navigator>button:not(.calendar-picker){width:28px}
+ .admin-theme .planner-navigation .view-switch button{min-width:32px;padding-inline:8px}
+ .admin-theme .week-strip{padding-inline:8px}
+}
+
+.admin-theme .student-card-shell,.admin-theme .mobile-lesson{container-type:inline-size;container-name:student-card}
+.admin-theme .student-card>div{justify-content:flex-start;gap:4px}
+.admin-theme .student-card strong{flex:1;min-width:0}
+.admin-theme .student-card .student-marks,.admin-theme .student-card .pc-owned-mark{flex-shrink:0}
+.admin-theme .student-card .course{max-width:none}
+@container student-card (max-width:190px){
+ .admin-theme .student-card{column-gap:4px;padding-inline:4px}
+ .admin-theme .student-card .course{max-width:3em;padding-inline:2px}
+}
+@container student-card (max-width:120px){
+ .admin-theme .student-card{grid-template-columns:minmax(0,1fr)}
+ .admin-theme .student-card .course{justify-self:end}
+}
+
+.admin-theme .schedule-admin-tools{display:flex;align-items:center;justify-content:space-between;gap:8px 16px;flex-basis:100%;min-width:0;padding-top:8px;border-top:1px solid var(--line)}
+.admin-theme .schedule-tools-label{font-size:12px;color:var(--ink-muted);white-space:nowrap}
+.admin-theme .schedule-tools-buttons{display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:6px;min-width:0}
+.admin-theme .schedule-tools-buttons>[data-slot=button]{min-height:36px;height:36px;font-size:12px;padding-inline:10px;gap:6px}
+@container schedule-planner (max-width:650px){
+ .admin-theme .schedule-admin-tools{align-items:stretch;flex-direction:column;gap:6px}
+ .admin-theme .schedule-tools-buttons{justify-content:flex-start}
+}
+@container schedule-planner (max-width:380px){
+ .admin-theme .schedule-tools-buttons{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));width:100%}
+ .admin-theme .schedule-tools-buttons>[data-slot=button]:last-child:nth-child(3){grid-column:1/-1}
+}
+
+.admin-theme .month-board.staff-view .month-teacher-group:not(.unassigned):not(.absent-group){background:var(--surface-sunken)}
+.admin-theme .month-board.staff-view .month-teacher-group.current-staff:not(.unassigned){background:var(--primary-soft);box-shadow:inset 3px 0 0 var(--primary)}
+
+/* Do not insert/move the unassigned drag source when a native drag starts. */
+.admin-theme .slot-footer{position:relative}
+.admin-theme .slot-drop-hint{position:absolute;top:0;right:8px;padding:2px 6px;opacity:0;z-index:1;font-size:10px;transition:opacity .15s}
+.admin-theme .slot-drop-hint.active{opacity:1}
+
+/* Preserve drop-target geometry while removing competing controls during drag. */
+.admin-theme .lesson-board.drag-active .add-student{visibility:hidden;pointer-events:none}
+
+/* Keep the preparation action and save controls on a separate mobile header row. */
+@media(max-width:700px){
+ .admin-theme .shift-shell-header{flex-wrap:wrap}
+ .admin-theme .shift-shell-header>div:first-child{flex:1 0 100%}
+ .admin-theme .shell-header>div:last-child{max-width:100%;flex-wrap:wrap;gap:6px}
+ .admin-theme .shell-header .save-state{display:none}
+}
+
+/* Lesson detail: summary, reading, management, then attendance. */
+.admin-theme .lesson-detail-dialog{width:calc(100% - 32px);max-width:560px;gap:0;overflow:clip}
+.admin-theme .lesson-detail-summary{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:16px;background:var(--muted);border-radius:var(--radius);margin:4px 0 12px}
+.admin-theme .lesson-detail-date{display:flex;gap:12px;align-items:flex-start;min-width:0}
+.admin-theme .lesson-detail-date>svg{flex-shrink:0;margin-top:3px;color:var(--primary)}
+.admin-theme .lesson-detail-date strong{display:block;font-size:18px;line-height:1.5}
+.admin-theme .lesson-detail-date span{display:block;margin-top:3px;font-size:13px;color:var(--muted-foreground);overflow-wrap:anywhere}
+.admin-theme .lesson-detail-badges{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:4px;flex-shrink:0;max-width:100px}
+.admin-theme .lesson-detail-badges span{border:1px solid var(--border);border-radius:5px;padding:3px 7px;font-size:12px;background:var(--background)}
+.admin-theme .lesson-detail-badges .absent{color:var(--destructive);border-color:var(--destructive)}
+.admin-theme .lesson-detail-note{margin-top:18px}
+.admin-theme .lesson-detail-note h3{font-size:12px;color:var(--muted-foreground);font-weight:600;margin:0 0 8px}
+.admin-theme .lesson-detail-note p{font-size:14px;line-height:1.7;white-space:pre-wrap;overflow-wrap:anywhere;margin:0}
+.admin-theme .lesson-detail-footer{display:flex;flex-direction:column;gap:12px;border-top:1px solid var(--border);margin-top:20px;padding-top:16px}
+.admin-theme .lesson-detail-footer>div{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:8px;width:100%}
+@media(max-width:640px){.admin-theme .lesson-detail-dialog{width:100%;max-width:100%}.admin-theme .lesson-detail-summary{gap:8px;padding:12px}.admin-theme .lesson-detail-date{gap:8px}.admin-theme .lesson-detail-date strong{font-size:16px}.admin-theme .lesson-detail-footer>div{display:grid;grid-template-columns:1fr 1fr;width:100%}}
+.admin-theme .lesson-detail-dialog>[data-slot=drawer-header],.admin-theme .lesson-detail-dialog>[data-slot=dialog-header],.admin-theme .lesson-detail-dialog>.lesson-detail-footer{flex-shrink:0}
+.admin-theme .lesson-detail-dialog .lesson-view>div{grid-template-columns:7rem minmax(0,1fr)}
+.admin-theme .lesson-detail-dialog .lesson-view>div:last-child{border-bottom:0}
+
+
+.admin-theme .student-card .lesson-note-preview,.admin-theme .mobile-lesson .lesson-note-preview,.admin-theme .month-lessons .lesson-note-preview{display:block;flex:0 1 auto;min-width:0;max-width:10em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px;font-weight:400;line-height:1.5;color:var(--muted-foreground);text-align:left}
+.admin-theme .student-card>div:has(.lesson-note-preview),.admin-theme .mobile-lesson-name:has(.lesson-note-preview),.admin-theme .month-student-name:has(.lesson-note-preview){display:flex;align-items:center;flex-wrap:nowrap;gap:6px;min-width:0;overflow:hidden}
+.admin-theme .student-card>div:has(.lesson-note-preview)>strong,.admin-theme .month-student-name:has(.lesson-note-preview)>strong{flex:0 0 auto}
+
+.lesson-note-tooltip{pointer-events:none;max-width:min(320px,calc(100vw - 24px));white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.6;padding:8px 12px}
+
+.admin-theme .lesson-detail-date .lesson-detail-meta{display:flex;flex-wrap:wrap;gap:4px 12px;margin-top:6px;color:var(--foreground)}
+.admin-theme .lesson-detail-date .lesson-detail-meta>span{display:inline;margin:0;color:inherit;font-size:13px}
+
+.admin-theme .lesson-detail-when{display:flex;align-items:baseline;flex-wrap:wrap;gap:4px 12px}.admin-theme .lesson-detail-when>span{margin-top:0}
+
+.admin-theme .teacher-segment>header,.admin-theme .mobile-teacher>h3{display:flex;align-items:center;gap:6px}
+.admin-theme .unassign-teacher{flex-shrink:0;width:32px;height:32px}
+
+.unassign-options{display:grid;gap:2px}.unassign-options label{display:flex;align-items:center;gap:8px;min-height:28px;margin:0;padding:0;cursor:pointer}.unassign-periods{display:grid;gap:2px;padding-left:12px}.unassign-time{color:var(--ink-muted);margin-left:4px}
+
+.admin-theme .month-board.drag-active .month-period{outline:1px dashed var(--control-border);outline-offset:-3px}
+.admin-theme .month-board.drag-active .month-teacher-group:not(.absent-group){outline:1px dashed var(--teacher-color,var(--control-border));outline-offset:-1px}
+.admin-theme .month-board.drag-active .month-teacher-group:not(.absent-group):hover{background:var(--primary-soft)}
+.admin-theme .month-lessons>button[draggable="true"]{cursor:grab}
+.admin-theme .month-lessons>button.dragging{opacity:.4}
+.admin-theme .month-period{position:relative}
+.admin-theme .month-drop-hint{position:absolute;bottom:4px;left:5px;right:5px;opacity:0;pointer-events:none;min-height:20px;padding:2px;background:var(--background);font-size:11px;text-align:center;color:var(--ink-muted);border:1px dashed var(--control-border);border-radius:5px}
+.admin-theme .month-drop-hint.active{opacity:1}
+
+/* Use the available main width for the timetable. */
+.admin-theme .dashboard-page.schedule-page{max-width:none;padding-inline:0;width:100%}
+.admin-theme .shell-content:has(.schedule-page){padding-inline:0}
+
+.admin-theme .schedule-page .planner-content{padding-inline:0}
+
+@container schedule-planner (min-width:900px){.admin-theme .schedule-page .planner-toolbar{flex-wrap:nowrap;gap:8px;padding-block:6px}.admin-theme .schedule-page .schedule-admin-tools{margin-left:auto;flex-basis:auto;border-top:0;padding-top:0}.admin-theme .schedule-page .schedule-tools-label{display:none}}
+
+/* Quiet secondary access keeps Slack as the primary login action. */
+.admin-theme .login-admin-access{margin-top:40px}
+.admin-theme .login-admin-access summary{font-size:12px;min-height:44px}
+.admin-theme .slack-login[aria-disabled="true"]{cursor:wait;background:#f6f5f7;color:#68636c}
+.admin-theme .login-progress{min-height:32px;padding-top:10px;text-align:center;font-size:12px;color:#68636c}
+.admin-theme .login-help{font-size:12px;color:#68636c;text-align:center}
+.admin-theme .login-help summary{cursor:pointer;list-style:none;padding:10px 4px;min-height:44px;border-radius:4px}
+.admin-theme .login-help summary::-webkit-details-marker{display:none}
+.admin-theme .login-help p{font-size:12px;line-height:1.8;text-align:left;margin:8px 0}
+.admin-theme .login-help .slack-alternative{font-size:13px;margin-top:10px;padding:10px 0}
+.admin-theme .login-retry{display:block;margin:8px auto 0;padding:10px 4px;font:inherit;text-decoration:underline;text-underline-offset:4px;cursor:pointer}
+.admin-theme .login-help summary:focus-visible,.admin-theme .login-retry:focus-visible{outline:2px solid #78365f;outline-offset:4px}
+.login-spinner{width:22px;height:22px;border:2px solid #ccc9ce;border-top-color:#4a154b;border-radius:50%;animation:login-spin .8s linear infinite}
+@keyframes login-spin{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){.login-spinner{animation:none}}
