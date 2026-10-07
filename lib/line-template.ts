@@ -11,12 +11,13 @@ export function lineDate(date:string,{weekday=true,padDay=false}={}){
  const day=padDay?date.slice(8,10):String(Number(date.slice(8,10)));
  return `${Number(date.slice(5,7))}月${day}日`+(weekday?`(${'日月火水木金土'[new Date(date+'T00:00:00Z').getUTCDay()]})`:'');
 }
-export function lineDateList(slots:ReadonlyArray<{date:string;start:string}>,{groupByDate=false,padDay=false}={}){
- const sorted=[...slots].sort((a,b)=>(a.date+a.start).localeCompare(b.date+b.start));
- if(!groupByDate)return sorted.map(slot=>`${lineDate(slot.date,{padDay})} ${slot.start}~`).join('\n');
+export function lineDateList(slots:ReadonlyArray<{date:string;start:string;end:string}>,{groupByDate=false,padDay=false,includeEnd=false}={}){
+ const sorted=[...slots].sort((a,b)=>(a.date+a.start+a.end).localeCompare(b.date+b.start+b.end));
+ const time=(slot:{start:string;end:string})=>`${slot.start}~${includeEnd?slot.end:''}`;
+ if(!groupByDate)return sorted.map(slot=>`${lineDate(slot.date,{padDay})} ${time(slot)}`).join('\n');
  const dates=new Map<string,Set<string>>();
- for(const slot of sorted){if(!dates.has(slot.date))dates.set(slot.date,new Set());dates.get(slot.date)!.add(slot.start)}
- return [...dates].map(([date,times])=>`${lineDate(date,{padDay})} ${[...times].map(time=>time+'~').join(',')}`).join('\n');
+ for(const slot of sorted){if(!dates.has(slot.date))dates.set(slot.date,new Set());dates.get(slot.date)!.add(time(slot))}
+ return Array.from(dates).map(([date,times])=>`${lineDate(date,{padDay})} ${Array.from(times).join(',')}`).join('\n');
 }
 export function composeLineMessage(opening:string,dates:string,closing:string,note=''){
  return [opening,dates+(note.trim()?'\n'+note.trim():''),closing].filter(Boolean).join('\n\n');

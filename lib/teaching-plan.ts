@@ -11,7 +11,7 @@ import {lessonPreferencePriority} from './preference-priority';
  * Large custom days use a bounded search; small pattern combinations are enumerated exactly.
  */
 export function buildTeachingPlan(state:State,scope:string[],reasons:Record<string,string>){
- const selected=new Set(scope),teachers=state.teachers.filter(t=>t.autoAssignLessons!==false&&t.max>0);
+ const selected=new Set(scope),teachers=state.teachers.filter(t=>!t.archived&&t.autoAssignLessons!==false&&t.max>0);
  const canTeach=(t:Teacher,l:Lesson,sl:Slot)=>!!t.rooms?.includes(sl.room)&&!!t.curricula?.includes(l.course)&&(!l.exam||t.canSuperviseExam===true);
  const eligible=(l:Lesson,sl:Slot)=>{const student=studentForLesson(state,l);return !student||statusAt(student,sl.date)==='active'};
  const groups=[...new Set(state.slots.filter(sl=>selected.has(sl.id)).map(sl=>sl.room+'|'+sl.date))].sort();

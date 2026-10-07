@@ -1,3 +1,4 @@
+import {normalizeLessonStatuses} from './lesson-state';
 import type {CampusSchedule,SettingsData,State} from './scheduler';
 
 const defaultAbbreviations:Record<string,string>={scratch:'SC',minecraft:'MC','html/css':'HC',javascript:'JS',unity:'UN',swift:'SW',roblox:'RB',robloxjr:'RJ',python:'PY',py:'PY',ipass:'IP'};
@@ -5,7 +6,7 @@ const defaultAbbreviations:Record<string,string>={scratch:'SC',minecraft:'MC','h
 const weekdays=[0,1,2,3,4,5,6];
 
 export function ensureSettings(state:State):State{
- const n=structuredClone(state);
+ const n=normalizeLessonStatuses(structuredClone(state));
  n.workAssignments??=[];
  const campuses=[...new Set([...(n.settings?.campuses||[]),...n.slots.map(x=>x.room),...(n.students||[]).map(x=>x.room)])].filter(Boolean).sort((a,b)=>a.localeCompare(b,'ja'));
  const curricula=[...new Set([...(n.settings?.curricula||[]),...n.lessons.map(x=>x.course),...(n.students||[]).map(x=>x.course)])].filter(Boolean).sort((a,b)=>a.localeCompare(b,'ja'));

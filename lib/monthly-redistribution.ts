@@ -24,7 +24,7 @@ export function matchTeachingPeriod(lessons:Lesson[],teachers:Teacher[],canTeach
  lessons.forEach((lesson,i)=>{
   edge(source,pupilBase+i,1,0);
   if(options.allowUnassigned)edge(pupilBase+i,sink,1,missingCost+priorities[i]*priorityWeight);
-  teachers.forEach((teacher,j)=>{if(teacher.autoAssignLessons!==false&&canTeach(teacher,lesson))assignments.push({lesson,teacher,edge:edge(pupilBase+i,teacherBase+j,1,lesson.teacher===teacher.name?0:1)})});
+  teachers.forEach((teacher,j)=>{if(!teacher.archived&&teacher.autoAssignLessons!==false&&canTeach(teacher,lesson))assignments.push({lesson,teacher,edge:edge(pupilBase+i,teacherBase+j,1,lesson.teacher===teacher.name?0:1)})});
  });
  teachers.forEach((teacher,j)=>{
   if(teacher.max<1)return;

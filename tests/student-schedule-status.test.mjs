@@ -1,0 +1,44 @@
+import {readFileSync} from 'node:fs';
+import {createRequire} from 'node:module';
+import {resolve,dirname} from 'node:path';
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import ts from 'typescript';
+const require=createRequire(import.meta.url),cache=new Map();
+function load(path,overrides={}){path=resolve(path);if(!Object.keys(overrides).length&&cache.has(path))return cache.get(path);const exports={};if(!Object.keys(overrides).length)cache.set(path,exports);const code=ts.transpileModule(readFileSync(path,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022,esModuleInterop:true}}).outputText;new Function('exports','require',code)(exports,id=>id in overrides?overrides[id]:id.startsWith('@/')?load(resolve(id.slice(2)+'.ts')):id.startsWith('.')?load(resolve(dirname(path),id+'.ts')):require(id));if(!Object.keys(overrides).length)cache.set(path,exports);return exports}
+const {studentScheduleStatus:status,setStudentScheduleStatus:set,reconcileStudentScheduleStatuses:reconcile,reopenStudentScheduleMonth:reopen,validStudentScheduleStatuses:valid}=load('lib/student-schedule-status.ts');
+const {mergeSchedule}=load('lib/schedule-merge.ts');
+const {rejectRequest}=load('lib/reject-request.ts');
+function fixture(){return {students:[{id:'s',name:'S',room:'R',course:'C',monthlyLessons:2,periods:[]}],slots:[{id:'a',room:'R',date:'2026-09-10',start:'09:00',end:'10:30'},{id:'b',room:'R',date:'2026-09-20',start:'09:00',end:'10:30'},{id:'c',room:'R',date:'2026-10-20',start:'09:00',end:'10:30'}],lessons:[{id:'l1',studentId:'s',name:'S',slot:'a',absent:false,teacher:'T',note:''},{id:'l2',studentId:'s',name:'S',slot:'b',absent:false,teacher:'T',note:''}],teachers:[{id:'t',name:'T',rooms:['R'],curricula:['C'],max:10}],availability:{},duty:{'T|a':true},history:[]}}
+const stage=(s,month='2026-09')=>status(s,s.students[0],month).status;
+test('existing schedules start adjusting, empty months uncreated, inactive months outside',()=>{const s=fixture();assert.equal(stage(s),'adjusting');assert.equal(stage(s,'2026-10'),'uncreated');s.students[0].periods=[{status:'paused',from:'2026-09',until:'2026-09'}];assert.equal(stage(s),'outside')});
+test('waiting and confirmed persist per student/month with actor and confirmation snapshot',()=>{const s=fixture();set(s,'s','2026-09','waiting','管理者');assert.equal(stage(s),'waiting');set(s,'s','2026-09','confirmed','管理者');assert.equal(stage(JSON.parse(JSON.stringify(s))),'confirmed');assert.equal(stage(s,'2026-10'),'uncreated');assert.equal(s.students[0].scheduleStatuses['2026-09'].updatedBy,'管理者');assert.ok(valid(s))});
+test('pending requests override both stages and cannot be manually confirmed, even with all lessons placed',()=>{for(const initial of ['waiting','confirmed']){const s=fixture();set(s,'s','2026-09',initial,'管理者');s.lessons[0].requestData={kind:'振替希望'};assert.equal(stage(s),'adjusting');assert.throws(()=>set(s,'s','2026-09','confirmed','管理者'),/変更依頼/);reconcile(s);delete s.lessons[0].requestData;assert.equal(stage(s),'adjusting')}});
+test('new requests stay adjusting after rejection; original slot release behavior is preserved',()=>{const s=fixture();set(s,'s','2026-09','confirmed','管理者');reopen(s.students[0],'2026-09');Object.assign(s.lessons[0],{absent:true,teacher:'',request:'振替希望',requestRestore:{teacher:'T'}});rejectRequest(s,'l1');assert.equal(stage(s),'adjusting');assert.equal(s.lessons[0].slot,'a');assert.equal(s.lessons[0].teacher,'')});
+test('all requests must be resolved before advancing',()=>{const s=fixture();s.lessons.forEach(l=>l.request='変更希望');s.lessons[0].request='';assert.equal(status(s,s.students[0],'2026-09').pending,1);assert.throws(()=>set(s,'s','2026-09','waiting','管理者'));s.lessons[1].request='';set(s,'s','2026-09','confirmed','管理者');assert.equal(stage(s),'confirmed')});
+test('shortage, excess and empty schedules cannot be confirmed',()=>{for(const count of [0,1,3]){const s=fixture();s.lessons=Array.from({length:count},(_,i)=>({...s.lessons[0],id:'l'+i}));assert.throws(()=>set(s,'s','2026-09','confirmed','管理者'),/契約回数/)}});
+test('date, time, absence, deletion and contract-count changes invalidate confirmation',()=>{for(const edit of [s=>s.slots[0].date='2026-09-11',s=>s.slots[0].start='09:30',s=>s.slots[0].end='11:00',s=>s.lessons[0].absent=true,s=>s.lessons.pop(),s=>s.students[0].monthlyLessons=4]){const s=fixture();set(s,'s','2026-09','confirmed','管理者');edit(s);assert.equal(stage(s),'adjusting');reconcile(s);assert.equal(s.students[0].scheduleStatuses['2026-09'].status,'adjusting')}});
+test('notes, staff assignment and array order do not invalidate agreed dates',()=>{const s=fixture();set(s,'s','2026-09','confirmed','管理者');s.lessons[0].note='内部メモ';s.lessons[0].teacher='';s.lessons.reverse();s.slots.reverse();assert.equal(stage(s),'confirmed')});
+test('transfers remain in original contract month; another month and same-name students remain independent',()=>{const s=fixture();set(s,'s','2026-09','confirmed','管理者');s.lessons[0].originalDate='2026-09-10';s.lessons[0].slot='c';assert.equal(stage(s),'adjusting');assert.equal(status(s,s.students[0],'2026-09').placed,2);assert.equal(status(s,s.students[0],'2026-10').placed,0);set(s,'s','2026-09','confirmed','管理者');s.lessons.push({...s.lessons[0],id:'other',studentId:'other',request:'振替希望'});assert.equal(stage(s),'confirmed')});
+test('legacy name matching stays scoped to the student room',()=>{const s=fixture();delete s.lessons[0].studentId;set(s,'s','2026-09','confirmed','管理者');s.slots.push({...s.slots[0],id:'outside',room:'Other'});s.lessons.push({...s.lessons[0],id:'outside',slot:'outside',request:'振替希望'});assert.equal(stage(s),'confirmed')});
+test('invalid persisted status metadata is rejected',()=>{for(const change of [r=>r.status='invalid',r=>r.snapshot=1,r=>r.updatedBy={},r=>r.updatedAt='never']){const s=fixture();set(s,'s','2026-09','confirmed','管理者');change(s.students[0].scheduleStatuses['2026-09']);assert.equal(valid(s),false)}const s=fixture();s.students[0].scheduleStatuses={'2026-13':{}};assert.equal(valid(s),false)});
+test('simultaneous status transitions conflict atomically and separate months merge',()=>{const base=fixture();set(base,'s','2026-09','waiting','管理者');const local=structuredClone(base),remote=structuredClone(base);set(local,'s','2026-09','confirmed','A');reopen(remote.students[0],'2026-09');const result=mergeSchedule(base,local,remote);assert.equal(result.conflicts.length,1);assert.deepEqual(result.conflicts[0].path,['students','s','scheduleStatuses','2026-09']);remote.students[0].scheduleStatuses=structuredClone(base.students[0].scheduleStatuses);set(remote,'s','2026-10','adjusting','B');const merged=mergeSchedule(base,local,remote);assert.equal(merged.conflicts.length,0);assert.equal(merged.state.students[0].scheduleStatuses['2026-10'].status,'adjusting')});
+test('confirmation merged with a remote date edit is reopened',()=>{const base=fixture(),local=structuredClone(base),remote=structuredClone(base);set(local,'s','2026-09','confirmed','A');remote.slots[0].start='09:30';const result=mergeSchedule(base,local,remote);assert.equal(result.conflicts.length,0);reconcile(result.state);assert.equal(stage(result.state),'adjusting')});
+test('first status records for separate months merge without a false conflict',()=>{const base=fixture(),local=structuredClone(base),remote=structuredClone(base);set(local,'s','2026-09','confirmed','A');set(remote,'s','2026-10','adjusting','B');const result=mergeSchedule(base,local,remote);assert.equal(result.conflicts.length,0);assert.equal(stage(result.state),'confirmed');assert.equal(stage(result.state,'2026-10'),'adjusting')});
+
+test('date protection survives legacy records, explicit adjusting, transfers and request rejection',()=>{
+ const {studentScheduleDatesLocked:locked}=load('lib/student-schedule-status.ts');
+ for(const initial of ['waiting','confirmed'])for(const legacy of [true,false]){
+  const s=fixture();set(s,'s','2026-09',initial,'管理者');
+  if(legacy)delete s.students[0].scheduleStatuses['2026-09'].datesLocked;
+  assert.equal(locked(s.students[0],'2026-09'),true);
+  s.lessons[0].originalDate='2026-09-10';s.lessons[0].slot='c';reconcile(s);
+  set(s,'s','2026-09','adjusting','管理者');
+  s.lessons[0].request='振替希望';rejectRequest(s,'l1');
+  assert.equal(locked(JSON.parse(JSON.stringify(s.students[0])),'2026-09'),true);
+  assert.equal(locked(s.students[0],'2026-10'),false);
+  assert.equal(s.lessons[0].slot,'c');assert.equal(stage(s),'adjusting');
+ }
+ const s=fixture();set(s,'s','2026-09','adjusting','管理者');assert.equal(locked(s.students[0],'2026-09'),false);
+ s.students[0].scheduleStatuses['2026-09'].datesLocked='true';assert.equal(valid(s),false);
+});

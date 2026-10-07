@@ -1,0 +1,17 @@
+import {readFileSync} from 'node:fs';
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import ts from 'typescript';
+const source=ts.transpileModule(readFileSync(new URL('../lib/line-message.ts',import.meta.url),'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
+const templateExports={};new Function('exports',ts.transpileModule(readFileSync('lib/line-template.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS}}).outputText)(templateExports);
+const exports={};new Function('exports','require',source)(exports,()=>templateExports);const {monthlyLineLessons,monthlyLineMessage}=exports;
+const student={id:'s',name:'生徒',room:'本社'};
+const state={slots:[{id:'a',room:'本社',date:'2026-10-02',start:'15:15',end:'16:45'},{id:'b',room:'本社',date:'2026-10-09',start:'10:45',end:'12:15'},{id:'c',room:'別校',date:'2026-10-02',start:'09:00',end:'10:30'},{id:'d',room:'本社',date:'2026-11-01',start:'09:00',end:'10:30'}],lessons:[{slot:'b',studentId:'s'},{slot:'a',studentId:'s'},{slot:'a',studentId:'other',name:'生徒'},{slot:'b',studentId:'s',absent:true},{slot:'c',name:'生徒'},{slot:'d',studentId:'s'}]};
+test('selects actual student and month, excludes absence and other campuses, sorts dates',()=>{assert.deepEqual(monthlyLineLessons(state,student,'2026-10').map(x=>x.slot.id),['a','b'])});
+test('formats reference message with Japanese weekdays and note',()=>{const text=monthlyLineMessage(state,student,'2026-10','持ち物をご確認ください',new Date('2026-09-06T01:00:00Z'));assert.ok(text.startsWith('おはようございます！'));assert.ok(text.includes('2026年10月'));assert.ok(text.includes('10月02日(金) 15:15~16:45\n10月09日(金) 10:45~12:15\n持ち物をご確認ください'));assert.ok(text.endsWith('よろしくお願いいたします！'))});
+test('groups multiple lesson time ranges on the same date into one line',()=>{const grouped={slots:[{id:'a',room:'本社',date:'2026-10-17',start:'15:15',end:'16:45'},{id:'b',room:'本社',date:'2026-10-17',start:'17:00',end:'18:30'},{id:'c',room:'本社',date:'2026-10-24',start:'15:15',end:'16:45'},{id:'d',room:'本社',date:'2026-10-24',start:'17:00',end:'18:30'}],lessons:['a','b','c','d'].map(slot=>({slot,studentId:'s'}))};const text=monthlyLineMessage(grouped,student,'2026-10','',new Date('2026-09-07T12:00:00+09:00'));assert.match(text,/10月17日\(土\) 15:15~16:45,17:00~18:30\n10月24日\(土\) 15:15~16:45,17:00~18:30/);assert.doesNotMatch(text,/10月17日\(土\).*\n10月17日\(土\)/)});
+test('uses Japan time for greeting and returns no message for empty month',()=>{assert.ok(monthlyLineMessage(state,student,'2026-10','',new Date('2026-09-06T08:00:00Z')).startsWith('こんばんは！'));assert.equal(monthlyLineMessage(state,student,'2026-12'),'')});
+
+test('greeting boundaries use Japan time, including midnight',()=>{for(const [time,greeting] of [['00:00','こんばんは！'],['04:59','こんばんは！'],['05:00','おはようございます！'],['10:59','おはようございます！'],['11:00','こんにちは！'],['16:59','こんにちは！'],['17:00','こんばんは！'],['23:59','こんばんは！']])assert.ok(monthlyLineMessage(state,student,'2026-10','',new Date('2026-09-07T'+time+':00+09:00')).startsWith(greeting),time)});
+
+test('custom template preserves dates and expands only supported placeholders',()=>{const text=monthlyLineMessage(state,student,'2026-10','',new Date('2026-09-07T00:00:00Z'),{opening:'{挨拶} {年}/{月}のお知らせ',closing:'変更はご相談ください {未知}'});assert.match(text,/おはようございます！ 2026\/10のお知らせ/);assert.match(text,/10月02日\(金\) 15:15~16:45/);assert.ok(text.endsWith('変更はご相談ください {未知}'))});
