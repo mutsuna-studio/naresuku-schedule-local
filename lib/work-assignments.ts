@@ -1,10 +1,10 @@
 import type {State,Slot} from './scheduler';
 
-export type WorkAssignment={id:string;teacherId:string;slot:string;title:string};
+export type WorkAssignment={id:string;teacherId:string;slot:string;title:string;note?:string};
 const overlap=(a:Slot,b:Slot)=>a.date===b.date&&a.start<b.end&&b.start<a.end;
 export function workAt(state:State,teacherName:string,slotId:string){
  const teacher=state.teachers.find(item=>item.name===teacherName);
- return (state.workAssignments||[]).filter(item=>item.teacherId===teacher?.id&&item.slot===slotId);
+ return (state.workAssignments||[]).filter(item=>item.teacherId===(teacher?.id||'')&&item.slot===slotId);
 }
 export function hasWorkAssignment(state:State,teacherName:string,slotId:string){return workAt(state,teacherName,slotId).length>0}
 export function workConflict(state:State,teacherName:string,slot:Slot){
@@ -18,7 +18,7 @@ export function scheduledForWork(state:State,teacherName:string,slotId:string){
 export function validateWorkAssignments(state:State):string|null{
  const items=state.workAssignments;
  if(items===undefined)return null;
- if(!Array.isArray(items)||items.some(item=>!item||typeof item.id!=='string'||!item.id||typeof item.teacherId!=='string'||typeof item.slot!=='string'||typeof item.title!=='string'||!item.title.trim()||item.title.length>100)||new Set(items.map(item=>item.id)).size!==items.length)return '業務の担当者・時間帯・業務名を確認してください';
+ if(!Array.isArray(items)||items.some(item=>!item||typeof item.id!=='string'||!item.id||typeof item.teacherId!=='string'||typeof item.slot!=='string'||typeof item.title!=='string'||!item.title.trim()||item.title.length>100||(item.note!==undefined&&(typeof item.note!=='string'||item.note.length>5000)))||new Set(items.map(item=>item.id)).size!==items.length)return '業務の担当者・時間帯・業務名・メモを確認してください';
  for(const item of items){
   const teacher=state.teachers.find(teacher=>teacher.id===item.teacherId),slot=state.slots.find(slot=>slot.id===item.slot);
   if(!teacher||!slot||!teacher.rooms?.includes(slot.room))return '業務の担当教室・スタッフ・時間帯を確認してください';

@@ -1,3 +1,4 @@
+import {completeLessonTransfer} from './lesson-status';
 import {workConflict} from './work-assignments';
 import type {State} from './scheduler';
 
@@ -11,7 +12,7 @@ export function moveLesson(state:State,lessonId:string,slotId:string,teacherName
  if(teacherName&&!state.teachers.some(teacher=>teacher.name===teacherName))return false;
  if(lesson.slot===slotId&&lesson.teacher===teacherName)return false;
  const previousSlot=lesson.slot,previousTeacher=lesson.teacher;
- if(previousSlot!==slotId)lesson.originalDate ||= source.date;
+ if(previousSlot!==slotId)completeLessonTransfer(state,lesson,slotId);
  lesson.slot=slotId;lesson.teacher=teacherName;
  if(previousTeacher&&!state.lessons.some(item=>!item.absent&&item.slot===previousSlot&&item.teacher===previousTeacher))delete state.duty[previousTeacher+'|'+previousSlot];
  if(teacherName)state.duty[teacherName+'|'+slotId]=true;
