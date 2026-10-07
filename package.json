@@ -12,7 +12,7 @@
     "test": "node --test tests/*.test.mjs"
   },
   "dependencies": {
-    "@mutsuna/ui": "^0.11.0",
+    "@mutsuna/ui": "^0.13.0",
     "@sveltejs/vite-plugin-svelte": "^7.3.0",
     "@tailwindcss/vite": "^4.3.3",
     "class-variance-authority": "0.7.1",

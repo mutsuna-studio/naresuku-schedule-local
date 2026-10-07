@@ -1,0 +1,5 @@
+/* Lesson status uses the contract month; staff colors stay on row labels and borders. */
+[data-schedule-status="confirmed"]{--schedule-status-bg:color-mix(in srgb,#35a65a 16%,var(--surface-raised))}
+[data-schedule-status="waiting"]{--schedule-status-bg:color-mix(in srgb,#e8b536 19%,var(--surface-raised))}
+[data-schedule-status="adjusting"]{--schedule-status-bg:color-mix(in srgb,#5295df 13%,var(--surface-raised))}
+[data-schedule-status="outside"],[data-schedule-status="uncreated"]{--schedule-status-bg:var(--surface-sunken)}

@@ -2,6 +2,8 @@ import {readFileSync} from 'node:fs';
 import {createRequire} from 'node:module';
 import {resolve,dirname} from 'node:path';
 import test from 'node:test';
+// Keep scheduling fixtures deterministic as the real calendar advances.
+test.mock.timers.enable({apis:['Date'],now:new Date('2026-09-01T00:00:00+09:00')});
 import assert from 'node:assert/strict';
 import ts from 'typescript';
 const require=createRequire(import.meta.url),cache=new Map();

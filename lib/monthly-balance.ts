@@ -7,7 +7,7 @@ export type MonthlyWorkload={name:string;excluded:boolean;availableDays:number;a
 const key=(name:string,id:string)=>name+'|'+id;
 const overlaps=(a:Slot,b:Slot)=>a.date===b.date&&a.start<b.end&&b.start<a.end;
 const timeKey=(slot:Slot)=>slot.date+'|'+slot.start+'|'+slot.end;
-const canTeach=(teacher:Teacher,lesson:Lesson,slot:Slot)=>teacher.autoAssignLessons!==false&&!!teacher.rooms?.includes(slot.room)&&!!teacher.curricula?.includes(lesson.course)&&(!lesson.exam||teacher.canSuperviseExam===true);
+const canTeach=(teacher:Teacher,lesson:Lesson,slot:Slot)=>!teacher.archived&&teacher.autoAssignLessons!==false&&!!teacher.rooms?.includes(slot.room)&&!!teacher.curricula?.includes(lesson.course)&&(!lesson.exam||teacher.canSuperviseExam===true);
 function validRuns(day:Slot[],chosen:Set<string>){
  const minimum=[3,5].includes(new Date(day[0].date+'T12:00:00').getDay())?1:2;
  let length=0;
@@ -25,7 +25,7 @@ function validRuns(day:Slot[],chosen:Set<string>){
 export function balanceMonthlyWorkload(before:State,state:State,scope:string[],reasons:Record<string,string>,reference:State=state){
  const selected=new Set(scope),months=new Set(state.slots.filter(slot=>selected.has(slot.id)).map(slot=>slot.date.slice(0,7)));
  const slots=state.slots.filter(slot=>months.has(slot.date.slice(0,7))),slotById=new Map(state.slots.map(slot=>[slot.id,slot]));
- const teachers=state.teachers.filter(teacher=>teacher.autoAssignLessons!==false);
+ const teachers=state.teachers.filter(teacher=>!teacher.archived&&teacher.autoAssignLessons!==false);
  const active=state.lessons.filter(lesson=>!lesson.absent);
  const at=new Map(state.slots.map(slot=>[slot.id,active.filter(lesson=>lesson.slot===slot.id)]));
  const days=[...new Set(slots.map(slot=>slot.room+'|'+slot.date))].map(group=>slots.filter(slot=>slot.room+'|'+slot.date===group).sort((a,b)=>a.start.localeCompare(b.start)));
@@ -190,6 +190,6 @@ export function balanceMonthlyWorkload(before:State,state:State,scope:string[],r
  }
  return state.teachers.map(teacher=>{
   const old=workload(before,teacher.name),next=workload(state,teacher.name),available=opportunities.get(teacher.name)!;
-  return {name:teacher.name,excluded:teacher.autoAssignLessons===false,availableDays:available.availableDays,availablePeriods:available.availablePeriods,beforeDays:old.days,afterDays:next.days,beforePeriods:old.periods,afterPeriods:next.periods,beforeLessons:before.lessons.filter(lesson=>!lesson.absent&&lesson.teacher===teacher.name&&months.has(slotById.get(lesson.slot)?.date.slice(0,7)||'')).length,afterLessons:active.filter(lesson=>lesson.teacher===teacher.name&&months.has(slotById.get(lesson.slot)?.date.slice(0,7)||'')).length};
+  return {name:teacher.name,excluded:!!teacher.archived||teacher.autoAssignLessons===false,availableDays:available.availableDays,availablePeriods:available.availablePeriods,beforeDays:old.days,afterDays:next.days,beforePeriods:old.periods,afterPeriods:next.periods,beforeLessons:before.lessons.filter(lesson=>!lesson.absent&&lesson.teacher===teacher.name&&months.has(slotById.get(lesson.slot)?.date.slice(0,7)||'')).length,afterLessons:active.filter(lesson=>lesson.teacher===teacher.name&&months.has(slotById.get(lesson.slot)?.date.slice(0,7)||'')).length};
  });
 }

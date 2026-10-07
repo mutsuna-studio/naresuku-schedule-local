@@ -4,7 +4,7 @@ export type Conflict={id:string;label:string;path:string[];base:any;local:any;re
 export type ConflictChoices=Record<string,'local'|'remote'>;
 export type MergeResult={state:State;conflicts:Conflict[]};
 const labels:Record<string,string>={students:'生徒',lessons:'授業',slots:'授業枠',teachers:'スタッフ',preferences:'希望スケジュール',settings:'設定',availability:'出勤希望',duty:'担当',workAssignments:'固定業務',title:'業務名',teacherId:'担当者',name:'名前',room:'校舎',course:'カリキュラム',monthlyLessons:'契約回数',periods:'在籍期間',birthDate:'生年月日',ownsComputer:'PC所持',reviewed:'確認済み',progressSheetUrl:'進捗シート',teacher:'担当',absent:'欠席',request:'保護者の申請'};
-Object.assign(labels,{note:'授業メモ',slot:'授業日時・教室',studentId:'生徒',exam:'検定本番',originalDate:'振替前の日付',occurrence:'定期授業の対応',requestData:'申請内容',requestRestore:'申請前の担当',kind:'種別',reason:'理由',preferredSlots:'希望日時',message:'メッセージ',date:'日付',start:'開始',end:'終了',email:'メールアドレス',rooms:'担当教室',adminRooms:'管理する教室',curricula:'担当カリキュラム',max:'担当人数の上限',autoAttendance:'自動出勤',autoAssignLessons:'自動割り当て',canSuperviseExam:'検定対応',weekday:'曜日',weeks:'対象週',priority:'優先順位',frequency:'頻度',until:'終了日',alternatives:'別の希望日時',reviewNote:'確認メモ',campuses:'教室',schedules:'開講日時',closeOnHolidays:'祝日休講',sidebarLinks:'メニューリンク',curriculumAbbreviations:'カリキュラム略称',lineVisibleAccounts:'LINE表示対象',lineSnippets:'LINE定型文',lineEmojis:'LINE絵文字'});
+Object.assign(labels,{scheduleStatuses:'月別スケジュールステータス',status:'状態',snapshot:'確認した予定',updatedAt:'更新日時',updatedBy:'更新者',note:'授業メモ',slot:'授業日時・教室',studentId:'生徒',exam:'検定本番',originalDate:'振替前の日付',occurrence:'定期授業の対応',requestData:'申請内容',requestRestore:'申請前の担当',kind:'種別',reason:'理由',preferredSlots:'希望日時',message:'メッセージ',date:'日付',start:'開始',end:'終了',email:'メールアドレス',rooms:'担当教室',adminRooms:'管理する教室',curricula:'担当カリキュラム',max:'担当人数の上限',archived:'退職・非表示',autoAttendance:'自動出勤',autoAssignLessons:'自動割り当て',canSuperviseExam:'検定対応',weekday:'曜日',weeks:'対象週',priority:'優先順位',frequency:'頻度',until:'終了日',alternatives:'別の希望日時',reviewNote:'確認メモ',campuses:'教室',schedules:'開講日時',closeOnHolidays:'祝日休講',sidebarLinks:'メニューリンク',curriculumAbbreviations:'カリキュラム略称',lineVisibleAccounts:'LINE表示対象',lineSnippets:'LINE定型文',lineEmojis:'LINE絵文字'});
 function equal(a:any,b:any):boolean{
  if(Object.is(a,b))return true;
  if(!a||!b||typeof a!=='object'||typeof b!=='object'||Array.isArray(a)!==Array.isArray(b))return false;
@@ -27,6 +27,8 @@ export function mergeSchedule(base:State,local:State,remote:State,choices:Record
  function visit(b:any,l:any,r:any,path:string[],label:string):any{
   if(equal(l,b))return r;
   if(equal(r,b)||equal(l,r))return l;
+  // New monthly records can be created independently on two devices.
+  if(path[0]==='students'&&path[2]==='scheduleStatuses'&&path.length===3&&b===undefined&&record(l)&&record(r))b={};
   if(path.length===1&&path[0]==='history'&&Array.isArray(l)&&Array.isArray(r)){
    const added=l.filter(item=>!(b||[]).some((old:any)=>equal(item,old)));
    return [...added,...r].filter((item,index,all)=>all.findIndex(other=>equal(item,other))===index).sort((a,b)=>b.at.localeCompare(a.at)).slice(0,100);
@@ -42,15 +44,14 @@ export function mergeSchedule(base:State,local:State,remote:State,choices:Record
     }).filter(item=>item!==undefined);
    }
   }
-  // Only the note is independent. Every other lesson field (including future
-  // fields) stays atomic so assignment, transfers and parent requests stay safe.
-  if(path[0]==='lessons'&&path.length===2&&[b,l,r].every(record)){
+  // Notes are independent; scheduling fields on the same record stay atomic.
+  if((path[0]==='lessons'||path[0]==='workAssignments')&&path.length===2&&[b,l,r].every(record)){
    const operational=[b,l,r].map(value=>Object.fromEntries(Object.entries(value).filter(([key])=>key!=='note')));
-   const schedule=visit(operational[0],operational[1],operational[2],[...path,'$schedule'],label+' / 授業予定');
-   const note=visit(b.note,l.note,r.note,[...path,'note'],label+' / 授業メモ');
+   const schedule=visit(operational[0],operational[1],operational[2],[...path,'$schedule'],label+(path[0]==='lessons'?' / 授業予定':' / 固定業務'));
+   const note=visit(b.note,l.note,r.note,[...path,'note'],label+(path[0]==='lessons'?' / 授業メモ':' / 業務メモ'));
    return {...schedule,...(note===undefined?{}:{note})};
   }
-  if([b,l,r].every(record)&&!(path[0]==='lessons'&&path[2]==='$schedule')&&!(path[0]==='workAssignments'&&path.length===2)){
+  if([b,l,r].every(record)&&!(path[0]==='students'&&path[2]==='scheduleStatuses'&&path.length===4)&&!((path[0]==='lessons'||path[0]==='workAssignments')&&path[2]==='$schedule')){
    const result:Record<string,any>={};
    for(const key of new Set([...Object.keys(b),...Object.keys(l),...Object.keys(r)])){
     const value=visit(b[key],l[key],r[key],[...path,key],label?label+' / '+(labels[key]||key):(labels[key]||key));
@@ -89,11 +90,11 @@ function changeUnits(base:any,value:any,path:string[]=[],result=new Map<string,a
  if(path.length===1&&keyed.has(path[0])&&[base,value].every(Array.isArray)&&[base,value].every(items=>items.every((item:any)=>identity(item,path[0]))&&new Set(items.map((item:any)=>identity(item,path[0]))).size===items.length)){
   const maps=[base,value].map(items=>new Map<string,any>(items.map((item:any)=>[identity(item,path[0]),item])));
   for(const id of new Set([...maps[0].keys(),...maps[1].keys()]))changeUnits(maps[0].get(id),maps[1].get(id),[...path,id],result);
- }else if(path[0]==='lessons'&&path.length===2&&[base,value].every(record)){
+ }else if((path[0]==='lessons'||path[0]==='workAssignments')&&path.length===2&&[base,value].every(record)){
   const ops=[base,value].map(item=>Object.fromEntries(Object.entries(item).filter(([key])=>key!=='note')));
   changeUnits(ops[0],ops[1],[...path,'$schedule'],result);
   changeUnits(base.note,value.note,[...path,'note'],result);
- }else if([base,value].every(record)&&!(path[0]==='lessons'&&path[2]==='$schedule')&&!(path[0]==='workAssignments'&&path.length===2)){
+ }else if([base,value].every(record)&&!(path[0]==='students'&&path[2]==='scheduleStatuses'&&path.length===4)&&!(path[0]==='lessons'&&path[2]==='$schedule')&&!(path[0]==='workAssignments'&&path.length===2)){
   for(const key of new Set([...Object.keys(base),...Object.keys(value)]))changeUnits(base[key],value[key],[...path,key],result);
  }else result.set(JSON.stringify(path),value);
  return result;
@@ -112,20 +113,23 @@ export function saveSummaryMessage(summary:SaveSummary){
 }
 export type SaveConflict={kind:'conflict';base:State;local:State;remote:State;revision:number;conflicts:Conflict[];origin:SaveOrigin};
 export async function saveWithMerge(
- fetcher:typeof fetch,base:State,local:State,revision:number,normalize:(state:State)=>State=state=>state,origin:SaveOrigin={base,local}
+ fetcher:typeof fetch,base:State,local:State,revision:number,normalize:(state:State)=>State=state=>state,origin:SaveOrigin={base,local},
+ encode?: (base:State,local:State,revision:number)=>{method:'PATCH';body:string}|null,
+ readUrl='/api/schedule'
 ):Promise<{kind:'saved';state:State;revision:number;merged:boolean;summary:SaveSummary}|SaveConflict>{
  let merged=origin.base!==base;
  for(let attempt=0;attempt<3;attempt++){
-  const response=await fetcher('/api/schedule',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({revision,state:local})});
+  const delta=encode?.(base,local,revision);
+  const response=await fetcher('/api/schedule',{method:delta?.method||'PUT',headers:{'Content-Type':'application/json'},body:delta?.body||JSON.stringify({revision,state:local})});
   const result=await response.json();
   if(response.ok)return {kind:'saved',state:local,revision:result.revision,merged,summary:summarizeSave(origin,local)};
   if(response.status!==409)throw Error(result.error||'保存できませんでした');
-  const latest=await fetcher('/api/schedule',{cache:'no-store'});
+  const latest=await fetcher(readUrl,{cache:'no-store'});
   const current=await latest.json();
   if(!latest.ok)throw Error(current.error||'最新の変更を取得できませんでした。入力内容は保持しています。');
   const remote=normalize(current.state),comparison=mergeSchedule(base,local,remote);
   if(comparison.conflicts.length)return {kind:'conflict',base,local,remote,revision:current.revision,conflicts:comparison.conflicts,origin};
-  base=remote;local=comparison.state;revision=current.revision;merged=true;
+  base=remote;local=normalize(comparison.state);revision=current.revision;merged=true;
  }
  throw Error('更新が続いているため保存を完了できませんでした。入力内容は保持しています。少し待って再度保存してください。');
 }
@@ -153,6 +157,12 @@ export function describeConflict(conflict:Conflict,states:{base:State;local:Stat
  }
  function format(value:any,key:string,state:State):string{
   if(value===undefined||value===null||value==='')return '未設定';
+  if(conflict.path[2]==='scheduleStatuses'){
+   if(key==='status')return ({adjusting:'調整中',waiting:'確認待ち',confirmed:'確定'} as Record<string,string>)[value]||String(value);
+   if(key==='snapshot'){
+    try{const [room,count,lessons]=JSON.parse(value);return `${room} · 月${count}回：`+lessons.map((lesson:any[])=>`${lesson[1]} ${lesson[2]}–${lesson[3]}${lesson[4]?'（欠席）':''}`).join('、')}catch{return '予定の再確認が必要'}
+   }
+  }
   if(key==='slot')return slotLabel(value,state);
   if(key==='studentId')return [state,...all].flatMap(s=>s.students||[]).find(s=>s.id===value)?.name||'見つからない生徒';
   if(key==='teacherId')return [state,...all].flatMap(s=>s.teachers).find(t=>t.id===value)?.name||'見つからないスタッフ';

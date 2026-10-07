@@ -208,7 +208,7 @@
   align-self: start;
   min-width: 0;
   padding: 0 6px 10px;
-  border-right: 1px solid var(--line);
+  border-right: 0;
 }
 
 .admin-theme .slot-column {
@@ -257,7 +257,15 @@
 }
 
 .admin-theme .teacher-group.absent .student-card {
-  background: color-mix(in srgb, var(--surface-raised) 82%, var(--danger-soft));
+  background: white;
+  border: 1px solid #e3e9f2;
+  border-radius: 6px;
+  box-shadow: 0 1px 2px #19365305;
+}
+
+.admin-theme .teacher-group.absent .absent-status {
+  color: var(--danger);
+  background: color-mix(in srgb, var(--danger) 10%, var(--surface-raised));
 }
 
 .admin-theme .course {
@@ -305,10 +313,6 @@
   min-height: 32px;
   padding: 5px 8px;
   text-align: center;
-}
-
-.admin-theme .week-strip .date-strip-tail {
-  flex: 0 0 calc(100% - 88px);
 }
 
 .admin-theme .week-strip button span {
@@ -367,13 +371,10 @@
 }
 
 .admin-theme .save-state,
-.admin-theme .source-chip,
 .admin-theme .stats span,
 .admin-theme .stats small,
 .admin-theme .eyebrow,
 .admin-theme .page-heading p,
-.admin-theme .preferences-heading p,
-.admin-theme .roster-toolbar,
 .admin-theme .student-name span,
 .admin-theme .pref-patterns small,
 .admin-theme .teacher-list label,
@@ -541,11 +542,6 @@
 .admin-theme .login-separator::before,.admin-theme .login-separator::after{content:"";height:1px;flex:1;background:var(--border)}
 .admin-theme .lesson-view{display:grid;gap:0;margin:0}.admin-theme .lesson-view>div{display:grid;grid-template-columns:7rem 1fr;gap:1rem;padding:.7rem 0;border-bottom:1px solid var(--line)}.admin-theme .lesson-view dt{color:var(--ink-muted);font-size:.85rem}.admin-theme .lesson-view dd{margin:0;color:var(--ink);font-weight:600}.admin-theme .lesson-view-link{display:flex;align-items:center;justify-content:center;gap:.45rem;margin-top:1rem;padding:.65rem;border:1px solid var(--success);border-radius:var(--radius);background:var(--success-soft);color:var(--success);font-weight:700;text-decoration:none}
 
-.admin-theme .login-mark {
-  background: var(--primary);
-  color: var(--on-primary);
-}
-
 .admin-theme [data-slot='button'][class*='bg-primary']:hover {
   background: var(--primary-hover);
 }
@@ -579,14 +575,11 @@
  .admin-theme .planner{min-width:0}
  .admin-theme .planner-toolbar{display:grid;gap:12px;padding:12px;min-width:0}
  .admin-theme .planner-navigation{display:flex;flex-wrap:wrap;gap:10px;min-width:0;width:100%}
- .admin-theme .date-control{display:grid;grid-template-columns:40px minmax(0,1fr) 40px;gap:6px;width:100%;min-width:0}
- .admin-theme .date-control>button{min-width:0;width:100%;height:40px}
  .admin-theme .planner-toolbar>.app-inline{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;width:100%;min-width:0}
  .admin-theme .planner-toolbar>.app-inline>button{width:100%;height:auto;min-height:42px;padding:8px;font-size:13px;white-space:normal;line-height:1.5}
  .admin-theme .planner-toolbar>.app-inline>button svg{flex-shrink:0;width:15px}
  .admin-theme .week-strip{display:flex;gap:6px;overflow-x:auto;padding:8px 12px;min-width:0;max-width:100%;scrollbar-width:thin}
  .admin-theme .week-strip>button{flex:0 0 86px;min-height:42px}
- .admin-theme .week-strip .date-strip-tail{flex-basis:calc(100% - 86px)}
  .admin-theme .desktop-day-board{display:none}
  .admin-theme .mobile-day-board{display:grid;gap:16px;padding:12px;min-width:0}
  .admin-theme .mobile-period{min-width:0;border-top:1px solid var(--line);padding-top:12px}
@@ -627,10 +620,10 @@
  .admin-theme .month-lessons strong{text-align:left;margin-right:auto}
  .admin-theme .planner-toolbar>.app-inline>button:nth-child(3){grid-column:1/-1}
 }
-@media(max-width:700px){.admin-theme .shell-header h1{max-width:none}.admin-theme .date-control .calendar-picker{padding-inline:6px}.admin-theme .date-control .calendar-picker span{white-space:normal;overflow:visible;text-overflow:clip;line-height:1.3}}
-@media(max-width:380px){.admin-theme .date-control .calendar-picker{font-size:13px}.admin-theme .date-control .calendar-picker>svg{display:none}}
+@media(max-width:700px){.admin-theme .shell-header h1{max-width:none}}
 
-.admin-theme .lesson-board.drag-active .teacher-period{min-height:70px;outline:1px dashed var(--teacher-color);outline-offset:-3px}.admin-theme .lesson-board.drag-active .teacher-period:hover{background:var(--primary-soft)}.admin-theme .lesson-board.drag-active .slot-footer{min-height:72px;outline:1px dashed var(--control-border);outline-offset:-4px}.admin-theme .lesson-board.drag-active .slot-footer:hover{background:var(--primary-soft)}.admin-theme .slot-drop-hint{padding:14px 8px;font-size:12px;color:var(--ink-muted);text-align:center;pointer-events:none}
+
+.admin-theme .lesson-board.drag-active .teacher-period{min-height:70px;position:relative;isolation:isolate}.admin-theme .lesson-board.drag-active .teacher-period::after{content:"";position:absolute;inset:0;z-index:10;border-radius:8px;background:color-mix(in srgb,var(--teacher-color) 10%,transparent);pointer-events:none}.admin-theme .lesson-board.drag-active .teacher-period:hover::after{background:color-mix(in srgb,var(--teacher-color) 18%,transparent)}.admin-theme .lesson-board.drag-active .slot-footer{min-height:72px;position:relative;isolation:isolate}.admin-theme .lesson-board.drag-active .slot-footer::after{content:"";position:absolute;inset:0;z-index:10;border-radius:8px;background:color-mix(in srgb,var(--primary) 8%,transparent);pointer-events:none}.admin-theme .lesson-board.drag-active .slot-footer:hover::after{background:color-mix(in srgb,var(--primary) 16%,transparent)}.admin-theme .slot-drop-hint{padding:14px 8px;font-size:12px;color:var(--ink-muted);text-align:center;pointer-events:none}
 
 .admin-theme .week-strip button.today{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
 
@@ -660,21 +653,11 @@
 .admin-theme .planner-navigation{display:flex;align-items:center;flex-wrap:nowrap;gap:10px;width:auto;min-width:0;max-width:100%}
 .admin-theme .planner-navigation .view-switch{flex-shrink:0;gap:2px;padding:3px;border:0}
 .admin-theme .planner-navigation .view-switch button{min-width:36px;padding-inline:10px}
-.admin-theme .planner-navigation .date-control{display:grid;grid-template-columns:36px minmax(0,1fr) 36px;gap:4px;width:290px;min-width:0}
-.admin-theme .planner-navigation .date-control>button:not(.calendar-picker){width:36px;min-width:0;height:40px;padding:0}
-.admin-theme .planner-navigation .calendar-picker{min-width:0;width:100%;height:40px;padding-inline:8px}
-.admin-theme .planner-navigation .calendar-picker span{white-space:nowrap}
 .admin-theme .planner-toolbar>.app-inline{flex-wrap:wrap;gap:8px}
 .admin-theme .week-strip{padding-top:4px;padding-bottom:10px}
 @container schedule-planner (max-width:560px){
  .admin-theme .planner-toolbar{padding:8px;gap:8px}
  .admin-theme .planner-navigation{width:100%;gap:6px}
- .admin-theme .planner-navigation .date-control{flex:1;grid-template-columns:28px minmax(0,1fr) 28px;gap:2px}
- .admin-theme .planner-navigation .date-control>button:not(.calendar-picker){width:28px}
- .admin-theme .planner-navigation .calendar-picker{padding-inline:3px;font-size:12px;gap:3px}
- .admin-theme .planner-navigation .calendar-picker>svg{display:none}
- .admin-theme .planner-navigation .month-navigator{flex:1;min-width:0;max-width:none;grid-template-columns:28px minmax(0,1fr) 28px;gap:2px}
- .admin-theme .planner-navigation .month-navigator>button:not(.calendar-picker){width:28px}
  .admin-theme .planner-navigation .view-switch button{min-width:32px;padding-inline:8px}
  .admin-theme .week-strip{padding-inline:8px}
 }
@@ -726,10 +709,13 @@
 }
 
 /* Lesson detail: summary, reading, management, then attendance. */
-.admin-theme .lesson-detail-dialog{width:calc(100% - 32px);max-width:560px;gap:0;overflow:clip}
-.admin-theme .lesson-detail-summary{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:16px;background:var(--muted);border-radius:var(--radius);margin:4px 0 12px}
-.admin-theme .lesson-detail-date{display:flex;gap:12px;align-items:flex-start;min-width:0}
-.admin-theme .lesson-detail-date>svg{flex-shrink:0;margin-top:3px;color:var(--primary)}
+.admin-theme .lesson-detail-dialog{width:calc(100% - 32px);max-width:880px;gap:0;overflow:clip}
+.admin-theme .lesson-detail-body{display:grid;grid-template-columns:minmax(0,1fr) 240px;gap:24px;align-items:start}
+.admin-theme .lesson-detail-main{min-width:0}
+.admin-theme .lesson-detail-schedule{min-width:0;border-left:1px solid var(--border);padding-left:20px}
+.admin-theme .lesson-detail-summary{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin:4px 0 12px}
+.admin-theme .lesson-detail-date{min-width:0}
+.admin-theme .lesson-detail-readonly-when>svg{flex-shrink:0;margin-top:3px;color:var(--primary)}
 .admin-theme .lesson-detail-date strong{display:block;font-size:18px;line-height:1.5}
 .admin-theme .lesson-detail-date span{display:block;margin-top:3px;font-size:13px;color:var(--muted-foreground);overflow-wrap:anywhere}
 .admin-theme .lesson-detail-badges{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:4px;flex-shrink:0;max-width:100px}
@@ -740,7 +726,7 @@
 .admin-theme .lesson-detail-note p{font-size:14px;line-height:1.7;white-space:pre-wrap;overflow-wrap:anywhere;margin:0}
 .admin-theme .lesson-detail-footer{display:flex;flex-direction:column;gap:12px;border-top:1px solid var(--border);margin-top:20px;padding-top:16px}
 .admin-theme .lesson-detail-footer>div{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:8px;width:100%}
-@media(max-width:640px){.admin-theme .lesson-detail-dialog{width:100%;max-width:100%}.admin-theme .lesson-detail-summary{gap:8px;padding:12px}.admin-theme .lesson-detail-date{gap:8px}.admin-theme .lesson-detail-date strong{font-size:16px}.admin-theme .lesson-detail-footer>div{display:grid;grid-template-columns:1fr 1fr;width:100%}}
+@media(max-width:700px){.admin-theme .lesson-detail-dialog{width:100%;max-width:100%}.admin-theme .lesson-detail-body{display:block}.admin-theme .lesson-detail-schedule{border-left:0;padding-left:0}.admin-theme .lesson-detail-summary{gap:8px}.admin-theme .lesson-detail-date{gap:8px}.admin-theme .lesson-detail-date strong{font-size:16px}.admin-theme .lesson-detail-footer>div{display:grid;grid-template-columns:1fr 1fr;width:100%}}
 .admin-theme .lesson-detail-dialog>[data-slot=drawer-header],.admin-theme .lesson-detail-dialog>[data-slot=dialog-header],.admin-theme .lesson-detail-dialog>.lesson-detail-footer{flex-shrink:0}
 .admin-theme .lesson-detail-dialog .lesson-view>div{grid-template-columns:7rem minmax(0,1fr)}
 .admin-theme .lesson-detail-dialog .lesson-view>div:last-child{border-bottom:0}
@@ -752,10 +738,12 @@
 
 .lesson-note-tooltip{pointer-events:none;max-width:min(320px,calc(100vw - 24px));white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.6;padding:8px 12px}
 
-.admin-theme .lesson-detail-date .lesson-detail-meta{display:flex;flex-wrap:wrap;gap:4px 12px;margin-top:6px;color:var(--foreground)}
+.admin-theme .lesson-detail-date .lesson-detail-meta{display:flex;flex-wrap:wrap;gap:4px 12px;margin-top:6px;margin-left:32px;color:var(--foreground)}
 .admin-theme .lesson-detail-date .lesson-detail-meta>span{display:inline;margin:0;color:inherit;font-size:13px}
+.admin-theme .lesson-detail-date .lesson-detail-meta>.lesson-detail-pc{display:inline-flex;align-items:center;gap:4px;color:var(--muted-foreground)}
+.admin-theme .lesson-detail-date .lesson-detail-meta>.lesson-detail-pc.owned{color:var(--data-1);font-weight:600}
 
-.admin-theme .lesson-detail-when{display:flex;align-items:baseline;flex-wrap:wrap;gap:4px 12px}.admin-theme .lesson-detail-when>span{margin-top:0}
+.admin-theme .lesson-detail-date .lesson-detail-when{display:flex;align-items:baseline;flex-wrap:wrap;gap:4px 12px;margin-top:0;color:var(--foreground)}.admin-theme .lesson-detail-when>span{margin-top:0}
 
 .admin-theme .teacher-segment>header,.admin-theme .mobile-teacher>h3{display:flex;align-items:center;gap:6px}
 .admin-theme .unassign-teacher{flex-shrink:0;width:32px;height:32px}
@@ -794,3 +782,23 @@
 .login-spinner{width:22px;height:22px;border:2px solid #ccc9ce;border-top-color:#4a154b;border-radius:50%;animation:login-spin .8s linear infinite}
 @keyframes login-spin{to{transform:rotate(360deg)}}
 @media(prefers-reduced-motion:reduce){.login-spinner{animation:none}}
+
+.admin-theme .lesson-detail-date .lesson-detail-meta>.lesson-detail-pc-toggle{display:inline-flex;align-items:center;gap:4px;padding:0;border:0;background:transparent;font:inherit;font-size:13px;color:var(--muted-foreground);cursor:pointer;text-decoration:underline;text-decoration-style:dotted;text-underline-offset:4px}
+.admin-theme .lesson-detail-date .lesson-detail-meta>.lesson-detail-pc-toggle.owned{color:var(--data-1);font-weight:600}
+.admin-theme .lesson-detail-pc-toggle:disabled{cursor:default;text-decoration:none}
+.admin-theme .lesson-detail-pc-toggle:focus-visible{outline:2px solid var(--ring);outline-offset:4px;border-radius:2px}
+
+.admin-theme .lesson-detail-readonly-when{display:flex;align-items:flex-start;gap:12px}
+@media(max-width:700px){.admin-theme .lesson-detail-readonly-when{gap:8px}.admin-theme .lesson-detail-date .lesson-detail-meta{margin-left:28px}}
+
+.admin-theme .lesson-detail-exam-toggle{border:0;background:transparent;padding:3px 0;font:inherit;font-size:13px;color:var(--muted-foreground);cursor:pointer;text-decoration:underline;text-decoration-style:dotted;text-underline-offset:4px}
+.admin-theme .lesson-detail-exam-toggle[aria-pressed=true]{color:var(--foreground);font-weight:600}
+.admin-theme .lesson-detail-exam-toggle:disabled{cursor:default;text-decoration:none}
+.admin-theme .lesson-detail-exam-toggle:focus-visible{outline:2px solid var(--ring);outline-offset:4px;border-radius:2px}
+
+/* Vacant teacher cells accept unassigned lessons in their own period. */
+.admin-theme .empty-teacher-drop{position:relative;align-self:stretch;min-width:0;margin-inline:4px;border-radius:8px;isolation:isolate}
+.admin-theme .empty-teacher-drop>span{display:none}
+.admin-theme .empty-teacher-drop.drop-enabled{min-height:70px}
+.admin-theme .empty-teacher-drop.drop-enabled:hover::after{content:"";position:absolute;inset:0;z-index:10;border-radius:8px;background:color-mix(in srgb,var(--primary) 8%,transparent);pointer-events:none}
+.admin-theme .empty-teacher-drop.drop-enabled:hover>span{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:11;padding:8px;color:var(--ink-muted);font-size:12px;pointer-events:none}

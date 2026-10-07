@@ -5,7 +5,7 @@ export function nextMonthAction(state:State,room:string,month:string,role:'admin
  const prefix=Number(month.slice(5,7))+'月 ';
  const slots=state.slots.filter(slot=>slot.room===room&&slot.date.startsWith(month+'-'));
  if(!slots.length)return role==='admin'?{kind:'create',label:prefix+'コマ作成'}:null;
- const teachers=state.teachers.filter(t=>t.rooms?.includes(room)&&(role==='admin'||t.name===teacher));
+ const teachers=state.teachers.filter(t=>!t.archived&&t.rooms?.includes(room)&&(role==='admin'||t.name===teacher));
  const remaining=teachers.filter(t=>slots.some(slot=>!['yes','reserve','no'].includes(state.availability[t.name+'|'+slot.id])));
  if(!remaining.length)return null;
  if(role==='staff')return {kind:'input',label:prefix+'シフト入力'};

@@ -1,5 +1,6 @@
 <script lang="ts">
 import {Button} from '@mutsuna/ui/button';
+import {Textarea} from '@mutsuna/ui/textarea';
 import {Checkbox} from '@mutsuna/ui/checkbox';
 import * as Dialog from '@mutsuna/ui/responsive-dialog';
 import {showSuccessToast,showErrorToast} from '@mutsuna/ui/sonner';
@@ -30,9 +31,9 @@ async function copy(){try{await navigator.clipboard.writeText(message);showSucce
 {#if lesson}<p class="footnote">元の授業日から2か月以内の登録済み枠です。翌月以降は出勤希望に基づく候補です。申請期限・回数・再振替の可否は依頼内容と照合してください。</p>
 <p class="footnote">スタッフが対応でき、生徒の希望スケジュールにも合う候補を優先表示しています。</p>
 <div class="candidates">{#each candidates as candidate (candidate.id)}<label><Checkbox checked={chosen.includes(candidate.id)} onCheckedChange={checked=>chosen=checked?[...chosen,candidate.id]:chosen.filter(id=>id!==candidate.id)}/><span>{label(candidate)}{#if candidate.preferred}<small class="preferred">おすすめ · 第{candidate.priority}希望に一致</small>{/if}<small>{candidate.basis==='confirmed'?'担当配置あり':'出勤希望に基づく・要調整'}</small></span></label>{:else}<p>条件に合う候補がありません。開催枠・スタッフの配置や出勤希望を確認してください。検定の場合はスタッフの検定対応可の設定も確認してください。</p>{/each}</div>{/if}
-{#if selected.length}<label class="message">LINE返信文 · {selected.length}件<textarea rows="10" bind:value={message}></textarea></label>{/if}
+{#if selected.length}<label class="message">LINE返信文 · {selected.length}件<Textarea rows={10} bind:value={message}></Textarea></label>{/if}
 <p class="footnote">候補の作成・コピーでは、授業予定や欠席状態は変更されません。</p>
 </Dialog.Body><Dialog.Footer><Button variant="outline" onclick={()=>open=false}>閉じる</Button><Button disabled={!selected.length||!message.trim()} onclick={copy}>返信文をコピー</Button></Dialog.Footer></Dialog.Content></Dialog.Root>
 <style>
-.fields{display:grid;gap:14px}.candidates{display:grid;gap:10px;max-height:280px;overflow:auto;margin:16px 0}.candidates label{display:flex;align-items:center;gap:12px;padding:10px;border:1px solid var(--border);border-radius:8px}.candidates small{display:block;color:var(--muted-foreground)}.candidates .preferred{color:var(--primary);font-weight:600}.message{display:grid;gap:8px}.message textarea{width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;font:inherit;line-height:1.7;background:var(--background);color:var(--foreground);resize:vertical}
+.fields{display:grid;gap:14px}.candidates{display:grid;gap:10px;max-height:280px;overflow:auto;margin:16px 0}.candidates label{display:flex;align-items:center;gap:12px;padding:10px;border:1px solid var(--border);border-radius:8px}.candidates small{display:block;color:var(--muted-foreground)}.candidates .preferred{color:var(--primary);font-weight:600}.message{display:grid;gap:8px}.message :global(textarea){width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;font:inherit;line-height:1.7;background:var(--background);color:var(--foreground);resize:vertical}
 </style>

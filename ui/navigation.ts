@@ -91,3 +91,13 @@ export function createNavigationHistory(history:NavigationHistory) {
     reset(){current='';started=false;history.replaceState({...history.state,[historyKey]:null},'')},
   };
 }
+
+// A separate preference survives logout without retaining dates or other screens.
+export function rememberedRoom(scope:string,rooms:string[],storage:()=>SessionStore):string {
+  try { const room=storage().getItem('naresuku.last-room.v1:'+scope);return room&&rooms.includes(room)?room:''; }
+  catch { return ''; }
+}
+export function rememberRoom(scope:string,room:string,storage:()=>SessionStore):void {
+  if(!scope||!room)return;
+  try { storage().setItem('naresuku.last-room.v1:'+scope,room); } catch { /* Navigation remains usable without storage. */ }
+}
