@@ -4,7 +4,9 @@ export function createScheduleRefresh<T>(options: {
   snapshot: () => T | null;
   revision: () => number;
   fetch: typeof fetch;
+  readUrl?: () => string;
   apply: (value: any) => void;
+  unauthorized?: () => void;
 }) {
   let busy = false;
   let stopped = false;
@@ -22,13 +24,13 @@ export function createScheduleRefresh<T>(options: {
     const timeout = setTimeout(() => controller?.abort(), 10000);
     try {
       const check = await options.fetch('/api/schedule?revisionOnly=1', {signal: controller.signal});
-      if (!check.ok) throw Error('Schedule check failed');
+      if (!check.ok) {if ((check.status===401||check.status===403)&&current()) options.unauthorized?.();throw Error('Schedule check failed');}
       const latest = await check.json();
       if (!Number.isInteger(latest.revision)) throw Error('Invalid revision');
       if (!current()) return;
       if (latest.revision !== revision) {
-        const response = await options.fetch('/api/schedule', {signal: controller.signal});
-        if (!response.ok) throw Error('Schedule read failed');
+        const response = await options.fetch(options.readUrl?.() || '/api/schedule', {signal: controller.signal});
+        if (!response.ok) {if ((response.status===401||response.status===403)&&current()) options.unauthorized?.();throw Error('Schedule read failed');}
         const value = await response.json();
         if (current()) options.apply(value);
       }

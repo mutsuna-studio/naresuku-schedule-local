@@ -1,15 +1,16 @@
+import {japanToday} from './past-schedule';
 import {buildTeachingPlan} from './teaching-plan';
 import {balanceMonthlyWorkload} from './monthly-balance';
 import {lessonPreferencePriority,comparePreferencePriority} from './preference-priority';
-import {hasWorkAssignment} from './work-assignments';
+import {hasWorkAssignment,scheduledForWork} from './work-assignments';
 import {studentForLesson,statusAt} from './students';
 export type Slot={id:string;room:string;date:string;start:string;end:string;source?:string};
 export type LessonRequest={kind:string;reason:string;preferredSlots:string[];message?:string};
-export type Lesson={id:string;studentId?:string;slot:string;name:string;course:string;note:string;teacher:string;exam:boolean;absent:boolean;occurrence?:string;originalDate?:string;request?:string;requestRestore?:{teacher:string};requestData?:LessonRequest};
+export type Lesson={status?:import('./lesson-status').LessonStatus;transferAcceptance?:import('./lesson-status').TransferAcceptance;id:string;studentId?:string;slot:string;name:string;course:string;note:string;teacher:string;exam:boolean;absent:boolean;occurrence?:string;originalDate?:string;request?:string;requestRestore?:{teacher:string;status?:import('./lesson-status').LessonStatus};requestData?:LessonRequest};
 export type Preference={priority?:number;alternatives?:{weekday:number;start:string;end:string}[];id:string;studentId?:string;name:string;course:string;room:string;weekday:number;weeks:number[];start:string;end:string;source?:string;reviewNote?:string;anchor?:string;frequency?:"weekly"|"biweekly"|"monthly";until?:string};
 export type EnrollmentPeriod={id:string;status:"active"|"paused"|"withdrawn";from:string;until:string};
-export type Student={id:string;name:string;birthDate?:string;progressSheetUrl?:string;ownsComputer?:boolean;room:string;course:string;monthlyLessons:2|4;periods:EnrollmentPeriod[];reviewed:boolean};
-export type Teacher={adminRooms?:string[];id?:string;name:string;email?:string;autoAttendance?:boolean;autoAssignLessons?:boolean;canSuperviseExam?:boolean;max:number;curricula?:string[];rooms?:string[]};
+export type Student={scheduleStatuses?:Record<string,import('./student-schedule-status').ScheduleStatusRecord>;id:string;name:string;furigana?:string;birthDate?:string;progressSheetUrl?:string;ownsComputer?:boolean;room:string;course:string;monthlyLessons:2|4;periods:EnrollmentPeriod[];reviewed:boolean};
+export type Teacher={archived?:boolean;adminRooms?:string[];id?:string;name:string;email?:string;autoAttendance?:boolean;autoAssignLessons?:boolean;canSuperviseExam?:boolean;max:number;curricula?:string[];rooms?:string[]};
 export type ConfigPeriod={id:string;order:number;start:string;end:string};
 export type CampusSchedule={room:string;weekday:number;periods:ConfigPeriod[]};
 export type SettingsData={lineVisibleAccounts?:string[];lineSnippets?:import('./line-snippets').LineSnippet[];lineEmojis?:string[];sidebarLinks?:import('./sidebar-links').SidebarLink[];curriculumAbbreviations?:Record<string,string>;curricula:string[];campuses:string[];schedules:CampusSchedule[];closeOnHolidays?:Record<string,boolean>};
@@ -18,35 +19,44 @@ export type State={workAssignments?:import('./work-assignments').WorkAssignment[
 export const key=(t:string,s:string)=>t+'|'+s;
 export const overlaps=(a:Slot,b:Slot)=>a.date===b.date&&a.start<b.end&&b.start<a.end;
 export function runs(slots:Slot[],chosen:string[]){const sorted=[...slots].sort((a,b)=>a.start.localeCompare(b.start));const result:Slot[][]=[];let run:Slot[]=[];for(const s of sorted){if(chosen.includes(s.id))run.push(s);else if(run.length){result.push(run);run=[]}}if(run.length)result.push(run);return result;}
-export function issues(s:State){const result:{slot:string;text:string}[]=[];const active=s.lessons.filter(l=>!l.absent);
+export function issues(s:State,fromDate?:string){const result:{slot:string;text:string}[]=[];const active=s.lessons.filter(l=>!l.absent);
  for(const l of active){const slot=s.slots.find(x=>x.id===l.slot);if(!slot)continue;const student=studentForLesson(s,l);if(student&&statusAt(student,slot.date)!=='active')result.push({slot:l.slot,text:l.name+'：在籍期間と授業予定を確認（休会・退会・有効期間外）'});if(!l.teacher){result.push({slot:l.slot,text:l.name+'：担当未定'});continue;}const teacher=s.teachers.find(t=>t.name===l.teacher);if(l.exam&&!teacher?.canSuperviseExam)result.push({slot:l.slot,text:l.name+'：検定本番は検定対応可のスタッフが担当'});if(hasWorkAssignment(s,l.teacher,l.slot))result.push({slot:l.slot,text:l.teacher+'：固定業務と授業が重複'});if(!teacher?.rooms?.includes(slot.room))result.push({slot:l.slot,text:l.teacher+'：担当教室外'});if(!teacher?.curricula?.includes(l.course))result.push({slot:l.slot,text:l.teacher+'：担当カリキュラム外'});if(s.availability[key(l.teacher,l.slot)]==='no')result.push({slot:l.slot,text:l.teacher+'：出勤不可のコマに割り当てられています'});else if(!s.availability[key(l.teacher,l.slot)])result.push({slot:l.slot,text:l.teacher+'：出勤可能時間を要確認'});}
  for(const work of s.workAssignments||[]){const teacher=s.teachers.find(t=>t.id===work.teacherId);if(teacher&&s.availability[key(teacher.name,work.slot)]==='no')result.push({slot:work.slot,text:teacher.name+'：固定業務「'+work.title+'」の時間が出勤不可です'})}
  for(const t of s.teachers){const duty=s.slots.filter(sl=>hasWorkAssignment(s,t.name,sl.id)||s.duty[key(t.name,sl.id)]||active.some(l=>l.slot===sl.id&&l.teacher===t.name));
   for(const sl of duty){if(active.filter(l=>l.slot===sl.id&&l.teacher===t.name).length>t.max)result.push({slot:sl.id,text:t.name+'：担当人数が上限超過'});if(duty.some(o=>o.id!==sl.id&&overlaps(o,sl)))result.push({slot:sl.id,text:t.name+'：別枠・別教室と時間重複'});}
   const teaching=duty.filter(sl=>active.some(l=>l.slot===sl.id&&l.teacher===t.name));
-  for(const group of [...new Set(teaching.map(sl=>sl.room+'|'+sl.date))]){const all=s.slots.filter(sl=>sl.room+'|'+sl.date===group);for(const run of runs(all,teaching.map(sl=>sl.id))){const weekday=new Date(run[0].date+'T12:00:00').getDay();if((run.length<2&&![3,5].includes(weekday))||run.length>4)result.push({slot:run[0].id,text:t.name+'：連続'+run.length+'コマ（'+([3,5].includes(weekday)?'1':'2')+'〜4コマに調整）'});}}
+  for(const group of [...new Set(teaching.map(sl=>sl.room+'|'+sl.date))]){
+   const all=s.slots.filter(sl=>sl.room+'|'+sl.date===group);
+   const attendanceRuns=runs(all,all.filter(sl=>scheduledForWork(s,t.name,sl.id)).map(sl=>sl.id));
+   for(const run of runs(all,teaching.map(sl=>sl.id))){
+    const weekday=new Date(run[0].date+'T12:00:00').getDay();
+    const attendanceLength=attendanceRuns.find(attendance=>attendance.some(sl=>sl.id===run[0].id))?.length||run.length;
+    if((attendanceLength<2&&![3,5].includes(weekday))||(run.length>4&&t.autoAttendance!==true))result.push({slot:run[0].id,text:t.name+'：連続'+run.length+'コマ（'+([3,5].includes(weekday)?'1':'2')+'〜4コマに調整）'});
+   }
+  }
  }
  for(let i=0;i<active.length;i++){const a=active[i];const sa=s.slots.find(x=>x.id===a.slot);if(sa&&active.slice(i+1).some(b=>b.name===a.name&&s.slots.some(sb=>sb.id===b.slot&&overlaps(sa,sb))))result.push({slot:a.slot,text:a.name+'：生徒の予約時間が重複'});}
- return result.filter((x,i,a)=>a.findIndex(y=>y.slot===x.slot&&y.text===x.text)===i);
+ const visibleSlots=fromDate?new Set(s.slots.filter(slot=>slot.date>=fromDate).map(slot=>slot.id)):null;
+ return result.filter((x,i,a)=>(!visibleSlots||visibleSlots.has(x.slot))&&a.findIndex(y=>y.slot===x.slot&&y.text===x.text)===i);
 }
 export function monthAssignmentScope(state:State,room:string,month:string,now=new Date()){
  const today=now.toLocaleDateString('sv-SE',{timeZone:'Asia/Tokyo'});
  return state.slots.filter(slot=>slot.room===room&&slot.date.startsWith(month)&&slot.date>=today).map(slot=>slot.id);
 }
-export function autoAssign(state:State,scope:string[],mode:AssignmentMode='rebuild',options:{balanceMonth?:boolean}={}){const s=structuredClone(state);const selected=s.slots.filter(sl=>scope.includes(sl.id));const excluded=new Set(s.teachers.filter(t=>t.autoAssignLessons===false).map(t=>t.name));if(mode==='rebuild'){s.lessons.forEach(l=>{if(scope.includes(l.slot))l.teacher=''});for(const k of Object.keys(s.duty)){if(scope.some(id=>k.endsWith('|'+id)))delete s.duty[k];}}
+export function autoAssign(state:State,scope:string[],mode:AssignmentMode='rebuild',options:{balanceMonth?:boolean;now?:Date}={}){const today=japanToday(options.now);scope=scope.filter(id=>state.slots.some(slot=>slot.id===id&&slot.date>=today));const s=structuredClone(state);const selected=s.slots.filter(sl=>scope.includes(sl.id));const excluded=new Set(s.teachers.filter(t=>(t.archived||t.autoAssignLessons===false)).map(t=>t.name));if(mode==='rebuild'){s.lessons.forEach(l=>{if(scope.includes(l.slot))l.teacher=''});for(const k of Object.keys(s.duty)){if(scope.some(id=>k.endsWith('|'+id)))delete s.duty[k];}}
  // Existing lessons count as scheduled even if their derived duty flag is absent.
  const scheduled=(name:string,id:string)=>s.duty[key(name,id)]||s.lessons.some(l=>l.slot===id&&!l.absent&&l.teacher===name);
  const rank=(lesson:Lesson)=>{const slot=s.slots.find(item=>item.id===lesson.slot);return slot?lessonPreferencePriority(s,lesson,slot):null};
  const preferredFirst=(a:Lesson,b:Lesson)=>comparePreferencePriority(rank(a),rank(b));
  const eligible=(l:Lesson)=>{const st=studentForLesson(s,l);const sl=s.slots.find(x=>x.id===l.slot);return !st||!sl||statusAt(st,sl.date)==='active'};
- const canTeach=(t:Teacher,l:Lesson,room:string)=>t.autoAssignLessons!==false&&!!t.rooms?.includes(room)&&!!t.curricula?.includes(l.course)&&(!l.exam||t.canSuperviseExam===true);
+ const canTeach=(t:Teacher,l:Lesson,room:string)=>!t.archived&&t.autoAssignLessons!==false&&!!t.rooms?.includes(room)&&!!t.curricula?.includes(l.course)&&(!l.exam||t.canSuperviseExam===true);
  const count=(t:string,id:string)=>s.lessons.filter(l=>l.slot===id&&!l.absent&&l.teacher===t).length;
  const available=(t:string,sl:Slot)=>!hasWorkAssignment(s,t,sl.id)&&['yes','reserve'].includes(s.availability[key(t,sl.id)])&&!s.slots.some(other=>other.id!==sl.id&&overlaps(sl,other)&&(hasWorkAssignment(s,t,other.id)||s.duty[key(t,other.id)]||s.lessons.some(l=>!l.absent&&l.teacher===t&&l.slot===other.id)));
  const reasons:Record<string,string>={};
  for(const group of [...new Set(selected.map(sl=>sl.room+'|'+sl.date))]){const day=selected.filter(sl=>sl.room+'|'+sl.date===group).sort((a,b)=>a.start.localeCompare(b.start));const weekday=new Date(day[0].date+'T12:00:00').getDay();
   // Pick valid contiguous teaching blocks for all eligible staff.
   for(let iteration=0;iteration<s.teachers.length*day.length;iteration++){let best:{t:string;block:Slot[];score:number;priority:number}|null=null;
-   for(const t of s.teachers.filter(t=>t.autoAssignLessons!==false&&t.rooms?.includes(day[0].room))){for(let start=0;start<day.length;start++)for(let len=([3,5].includes(weekday)?1:2);len<=4&&start+len<=day.length;len++){const block=day.slice(start,start+len);if(!block.every(sl=>available(t.name,sl)))continue;const allChosen=day.filter(sl=>scheduled(t.name,sl.id)||block.some(b=>b.id===sl.id));if(runs(day,allChosen.map(x=>x.id)).some(r=>r.length>4))continue;
+   for(const t of s.teachers.filter(t=>!t.archived&&t.autoAssignLessons!==false&&t.rooms?.includes(day[0].room))){for(let start=0;start<day.length;start++)for(let len=([3,5].includes(weekday)?1:2);len<=4&&start+len<=day.length;len++){const block=day.slice(start,start+len);if(!block.every(sl=>available(t.name,sl)))continue;const allChosen=day.filter(sl=>scheduled(t.name,sl.id)||block.some(b=>b.id===sl.id));if(runs(day,allChosen.map(x=>x.id)).some(r=>r.length>4))continue;
     const needs=block.map(sl=>Math.min(t.max-count(t.name,sl.id),s.lessons.filter(l=>l.slot===sl.id&&!l.absent&&!l.teacher&&eligible(l)&&canTeach(t,l,sl.room)).length));if(needs.some((n,i)=>n<=0&&!scheduled(t.name,block[i].id)))continue;
     const total=needs.reduce((a,b)=>a+b,0);if(total<=0)continue;const score=total*100-len*2-block.filter(sl=>s.availability[key(t.name,sl.id)]==='reserve').length*20;
     const priority=block.reduce((sum,sl)=>sum+s.lessons.filter(l=>l.slot===sl.id&&!l.absent&&!l.teacher&&eligible(l)&&canTeach(t,l,sl.room)).sort((a,b)=>Number(b.exam)-Number(a.exam)||preferredFirst(a,b)).slice(0,Math.max(0,t.max-count(t.name,sl.id))).reduce((value,l)=>value+13-(rank(l)??13),0),0);
@@ -65,7 +75,7 @@ export function autoAssign(state:State,scope:string[],mode:AssignmentMode='rebui
   for(;;){
    if(!lessons.some(l=>!l.teacher&&eligible(l)))break;
    let best:{changes:Map<Lesson,string>;gain:number}|undefined;
-   for(const t of s.teachers.filter(t=>t.autoAssignLessons!==false)){
+   for(const t of s.teachers.filter(t=>!t.archived&&t.autoAssignLessons!==false)){
     for(let start=0;start<day.length;start++)for(let length=minimum;length<=4&&start+length<=day.length;length++){
      const block=day.slice(start,start+length);
      if(!block.every(sl=>scope.includes(sl.id)&&available(t.name,sl)))continue;
@@ -91,7 +101,7 @@ export function autoAssign(state:State,scope:string[],mode:AssignmentMode='rebui
        return true;
       }
       const sl=empty[index];
-      for(const donor of s.teachers.filter(other=>other.name!==t.name&&other.autoAssignLessons!==false)){
+      for(const donor of s.teachers.filter(other=>other.name!==t.name&&!other.archived&&other.autoAssignLessons!==false)){
        const owned=lessons.filter(l=>l.slot===sl.id&&teacherOf(l)===donor.name);
        const movable=owned.filter(l=>eligible(l)&&canTeach(t,l,sl.room));
        // Try shortening the donor's block before merely sharing this slot.
@@ -133,7 +143,7 @@ export function autoAssign(state:State,scope:string[],mode:AssignmentMode='rebui
  if(mode==='rebuild'&&!options.balanceMonth){
   const retainInput=structuredClone(state);
   for(const lesson of retainInput.lessons)if(scope.includes(lesson.slot)&&excluded.has(lesson.teacher))lesson.teacher='';
-  const retained=autoAssign(retainInput,scope,'fill').state;
+  const retained=autoAssign(retainInput,scope,'fill',{now:options.now}).state;
   for(const group of [...new Set(selected.map(sl=>sl.room+'|'+sl.date))]){
    const ids=new Set(selected.filter(sl=>sl.room+'|'+sl.date===group).map(sl=>sl.id));
    const active=(candidate:State)=>candidate.lessons.filter(l=>ids.has(l.slot)&&!l.absent);

@@ -2,7 +2,7 @@
 import Picker from './Picker.svelte';
 import type {State} from '../lib/scheduler';
 import {configuredPeriods} from '../lib/settings';
-let {state,room,weekday,start,end,onchange}:{state:State;room:string;weekday?:number;start:string;end:string;onchange:(start:string,end:string)=>void}=$props();
+let {state,room,weekday,start,end,inlineLabel=false,label='授業コマ',onchange}:{state:State;room:string;inlineLabel?:boolean;label?:string;weekday?:number;start:string;end:string;onchange:(start:string,end:string)=>void}=$props();
 const value=$derived(start+'|'+end);
 const items=$derived.by(()=>{
  const periods=new Map(configuredPeriods(state,room,weekday).map(x=>[x.value,x]));
@@ -11,4 +11,4 @@ const items=$derived.by(()=>{
  return [...periods.values()].sort((a,b)=>a.value.localeCompare(b.value));
 });
 </script>
-<Picker label="授業コマ" {value} {items} onchange={v=>{const [a,b]=v.split('|');if(a&&b)onchange(a,b)}}/>
+<Picker {label} {inlineLabel} {value} {items} onchange={v=>{const [a,b]=v.split('|');if(a&&b)onchange(a,b)}}/>

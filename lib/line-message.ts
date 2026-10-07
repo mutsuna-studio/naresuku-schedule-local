@@ -6,6 +6,6 @@ export function monthlyLineLessons(s:State,student:Student,month:string){
 export function monthlyLineMessage(s:State,student:Student,month:string,note='',now=new Date(),template:LineTemplate=defaultLineTemplate){
  const rows=monthlyLineLessons(s,student,month);if(!rows.length)return '';
  const {opening,closing}=renderLineTemplate(template,month,now);
- const dates=lineDateList(rows.map(({slot})=>slot),{padDay:true});
+ const dates=lineDateList(rows.map(({slot})=>slot),{groupByDate:true,padDay:true,includeEnd:true});
  return composeLineMessage(opening,dates,closing,note);
 }

@@ -23,11 +23,11 @@ onMount(()=>{const update=()=>refresh++;window.addEventListener('focus',update);
 const action=$derived(nextMonthAction(s,room,month,role,teacher,info?.history??null,info?.channel));
 function open(){if(!action)return;const kind=action.kind;onGuard(()=>{if(kind==='create')createOpen=true;else if(kind==='input')onInput(month);else notifications?.launch(kind==='reminder'?'reminder':'request')})}
 </script>
-{#if action}<button class="next-month-badge" {disabled} onclick={open} aria-label={room+'・'+action.label} title={room+'・翌月の準備'}>{action.label}<ChevronRight size={13}/></button>{/if}
+{#if action}<Button variant="ghost" class="next-month-badge h-auto whitespace-normal" {disabled} onclick={open} aria-label={room+'・'+action.label} title={room+'・翌月の準備'}>{action.label}<ChevronRight size={13}/></Button>{/if}
 {#if role==='admin'}
 <SlackNotifications bind:this={notifications} {room} {month} hideTrigger onUpdated={()=>refresh++}/>
 <Dialog.Root bind:open={createOpen}><Dialog.Content><Dialog.Header><Dialog.Title>{Number(month.slice(5,7))}月のコマを作成</Dialog.Title><Dialog.Description>{room}の開催設定からシフト入力用のコマを作成します。作成後に「変更を保存」を押してください。</Dialog.Description></Dialog.Header><Dialog.Footer><Button variant="outline" onclick={()=>createOpen=false}>キャンセル</Button><Button onclick={()=>{createOpen=false;onCreate(month)}}>コマを作成</Button></Dialog.Footer></Dialog.Content></Dialog.Root>
 {/if}
 <style>
-.next-month-badge{display:inline-flex;align-items:center;justify-content:center;gap:2px;min-height:36px;padding:4px 9px;border:1px solid color-mix(in srgb,var(--primary) 28%,var(--border));border-radius:999px;background:color-mix(in srgb,var(--primary) 8%,var(--background));color:var(--foreground);font-size:12px;font-weight:600;white-space:nowrap;cursor:pointer;flex-shrink:0}.next-month-badge:focus-visible{outline:2px solid var(--primary);outline-offset:2px}.next-month-badge:disabled{opacity:.5;cursor:default}@media(max-width:700px){.next-month-badge{min-height:40px;padding-inline:8px}}
+:global(.next-month-badge){display:inline-flex;align-items:center;justify-content:center;gap:2px;min-height:36px;padding:4px 9px;border:1px solid color-mix(in srgb,var(--primary) 28%,var(--border));border-radius:999px;background:color-mix(in srgb,var(--primary) 8%,var(--background));color:var(--foreground);font-size:12px;font-weight:600;white-space:nowrap;cursor:pointer;flex-shrink:0}:global(.next-month-badge:focus-visible){outline:2px solid var(--primary);outline-offset:2px}:global(.next-month-badge:disabled){opacity:.5;cursor:default}@media(max-width:700px){:global(.next-month-badge){min-height:40px;padding-inline:8px}}
 </style>
